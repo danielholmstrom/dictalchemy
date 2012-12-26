@@ -1,0 +1,128 @@
+# vim: set fileencoding=utf-8 :
+from __future__ import absolute_import, division
+
+from iteralchemy import IterableModel
+import unittest
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Table, Column, String, Integer, ForeignKey
+from sqlalchemy.orm import relationship, backref, synonym
+
+# Setup sqlalchemy
+engine = create_engine('sqlite:///:memory:', echo=False)
+from sqlalchemy.ext.declarative import declarative_base
+Base = declarative_base(engine, cls=IterableModel)
+
+class TestCase(unittest.TestCase):
+
+    def setUp(self):
+        """ Recreate the database """
+        Base.metadata.create_all(engine)
+        Session = sessionmaker(bind=engine)
+        self.session = Session()
+
+    def tearDown(self):
+        Base.metadata.drop_all()
+
+
+class Named(Base):
+    __tablename__ = 'named'
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+
+    def __init__(self, name):
+        self.name = name
+
+
+class NamedOtherColumnName(Base):
+    __tablename__ = 'named_with_other_column'
+
+    id = Column(Integer, primary_key=True)
+    name = Column('namecolumn', String)
+
+    def __init__(self, name):
+        self.name = name
+
+class NamedWithSynonym(Base):
+    __tablename__ = 'named_with_synonym'
+
+    id = Column(Integer, primary_key=True)
+    _name = Column(String)
+
+    def _setname(self, name):
+        self._name = name
+
+    def _getname(self):
+        return self._name
+
+    name = synonym('_name', descriptor=property(_getname, _setname))
+
+    def __init__(self, name):
+        self.name = name
+
+
+class OneToManyChild(Base):
+
+    __tablename__ = 'onetomanychild'
+
+    id = Column(Integer, primary_key=True)
+
+    name = Column(String)
+
+    def __init__(self, name):
+        self.name = name
+
+
+class OneToManyParent(Base):
+
+    __tablename__ = 'onetomanyparent'
+
+    id = Column(Integer, primary_key=True)
+
+    name = Column(String)
+
+    _child_id = Column(Integer, ForeignKey(OneToManyChild.id))
+
+    child = relationship(OneToManyChild,
+        primaryjoin=_child_id == OneToManyChild.id,
+            backref=backref('parent'))
+
+    def __init__(self, name):
+        self.name = name
+
+
+m2m_table = Table('m2m_table',
+        Base.metadata,
+        Column('left_id', Integer,
+            ForeignKey('m2mleft.id'),
+            primary_key=True),
+        Column('right_id', Integer,
+            ForeignKey('m2mright.id'),
+            primary_key=True),
+        )
+
+
+class M2mLeft(Base):
+    __tablename__ = 'm2mleft'
+
+    id = Column(Integer, primary_key=True)
+
+    name = Column(String)
+
+    def __init__(self, name):
+        self.name = name
+
+    rights = relationship('M2mRight', secondary=m2m_table,
+            backref=backref('lefts'))
+
+
+class M2mRight(Base):
+    __tablename__ = 'm2mright'
+
+    id = Column(Integer, primary_key=True)
+
+    name = Column(String)
+
+    def __init__(self, name):
+        self.name = name

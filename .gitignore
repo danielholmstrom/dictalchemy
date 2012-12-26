@@ -1,0 +1,7 @@
+*.pyc
+*.egg
+*.mo
+*.egg-info
+.coverage
+doc/_build
+\#*#
