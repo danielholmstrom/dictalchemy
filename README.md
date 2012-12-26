@@ -22,7 +22,7 @@ Mixin iterachlemy.IterableModel in a declarative class or use it as a base class
 {'id': 3, 'name': 'Gerald', 'roles': [{'id': 'admin'}, {'id': 'user'}]}
 ```
 
-See iteralchemy/test\_todict.py for more examples.
+See iteralchemy/test\_asdict.py for more examples.
 
 ## License
 
