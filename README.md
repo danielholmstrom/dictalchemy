@@ -10,14 +10,23 @@ No release, no version. This code should not be trusted.
 
 ## Usage
 
+### IterableModel
+
 Mixin iterachlemy.IterableModel in a declarative class or use it as a base class for declarative\_base. Each class can have the following attibutes set:
 
 * asdict\_exclude: List of properties that should be excluded by default(default empty)
 * asdict\_exclude\_underscore: Exclude properties starting with an underscore(default True)
 
+## make\_class\_iterable()
+
+This method can be run on existing classes to make them iterable.
+
 ## Examples
 
 ```
+>>> from iteralchemy import make_class_iterable
+>>> make_class_iterable(User)
+>>> user = session.query(User).first()
 >>> dict(user)
 {'id': 3, 'name': 'Gerald'}
 >>> user.asdict(exclude=['id'])
