@@ -25,7 +25,7 @@ This method can be run on existing classes to make them iterable.
 
 ```
 >>> from iteralchemy import make_class_iterable
->>> make_class_iterable(User)
+>>> make_class_iterable(Base)
 >>> user = session.query(User).first()
 >>> dict(user)
 {'id': 3, 'name': 'Gerald'}
