@@ -3,7 +3,8 @@ from __future__ import absolute_import, division
 from iteralchemy.tests import TestCase, Named, NamedOtherColumnName,\
         NamedWithSynonym, OneToManyChild, OneToManyParent,\
         M2mLeft, M2mRight,\
-        MultipleChildParent, MultipleChildChild1, MultipleChildChild2
+        MultipleChildParent, MultipleChildChild1, MultipleChildChild2,\
+        MultipleChildChild1Child
 
 
 class TestAsdict(TestCase):
@@ -18,6 +19,15 @@ class TestAsdict(TestCase):
         s.add(p)
         s.commit()
         return p, c1, c2
+
+    def _setup_multiple_child_child(self):
+        p, c1, c2 = self._setup_multiple_child()
+        s = self.session
+        c1c = MultipleChildChild1Child('child1child')
+        c1.child = c1c
+        s.add(c1)
+        s.commit()
+        return p, c1, c2, c1c
 
     def test_dict(self):
         named = Named('a name')
@@ -105,3 +115,18 @@ class TestAsdict(TestCase):
                     {'id': p.id, 'name': p.name,
                 'child1': {'id': c1.id, 'name': c1.name},
                 'child2': {'name': c2.name}}
+
+    def test_multiple_child_follow_two_levels(self):
+        p, c1, c2, c1c = self._setup_multiple_child_child()
+        assert p.asdict(follow={'child1': {'follow': ['child']}}) ==\
+                    {'id': p.id, 'name': p.name,
+                'child1': {'id': c1.id, 'name': c1.name,
+                    'child': {'id': c1c.id, 'name': c1c.name}}}
+
+    def test_multiple_child_follow_two_levels_with_arguments(self):
+        p, c1, c2, c1c = self._setup_multiple_child_child()
+        assert p.asdict(follow={'child1': {'follow':\
+                {'child': {'exclude': ['id']}}}}) ==\
+                    {'id': p.id, 'name': p.name,
+                'child1': {'id': c1.id, 'name': c1.name,
+                    'child': {'name': c1c.name}}}

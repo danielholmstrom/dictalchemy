@@ -130,6 +130,18 @@ class M2mRight(Base):
         self.name = name
 
 
+class MultipleChildChild1Child(Base):
+
+    __tablename__ = 'multiplechildchild1child'
+
+    id = Column(Integer, primary_key=True)
+
+    name = Column(String)
+
+    def __init__(self, name):
+        self.name = name
+
+
 class MultipleChildChild1(Base):
 
     __tablename__ = 'multiplechildchild1'
@@ -137,6 +149,12 @@ class MultipleChildChild1(Base):
     id = Column(Integer, primary_key=True)
 
     name = Column(String)
+
+    _child_id = Column(Integer, ForeignKey(MultipleChildChild1Child.id))
+
+    child = relationship(MultipleChildChild1Child,
+        primaryjoin=_child_id == MultipleChildChild1Child.id,
+            backref=backref('parent'))
 
     def __init__(self, name):
         self.name = name

@@ -1,6 +1,6 @@
 # Converts SQLAlchemy declarative models to dict
 
-Currently this works with synonyms and simple relations-ships as one-to-many and many-to-many. Relationships will only be followed one level.
+Currently this works with synonyms and simple relations-ships as one-to-many and many-to-many. Relationships can be followed in many levels.
 
 The only collection currently supported is sqlalchemy.orm.collections.InstrumentedList.
 
@@ -26,6 +26,8 @@ Mixin iterachlemy.IterableModel in a declarative class or use it as a base class
 {'id': 3, 'name': 'Gerald', 'roles': [{'id': 1, 'name': 'admin'}, {'id': 2, 'name': 'user'}]}
 >>> user.asdict(follow={'roles': {'exclude': ['id']})
 {'id': 3, 'name': 'Gerald', 'roles': [{'name': 'admin'}, {'name': 'user'}]}
+>>> user.asdict(follow={'roles': {'exclude': ['id'], 'follow': ['group']})
+{'id': 3, 'name': 'Gerald', 'roles': [{'name': 'admin', 'group': {'id': 1, 'name': 'admin'}}, {'name': 'user', 'group': {'id': 2, 'name': 'user'}}]}
 ```
 
 See iteralchemy/test\_asdict.py for more examples.
