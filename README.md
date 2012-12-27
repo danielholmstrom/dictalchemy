@@ -4,6 +4,10 @@ Currently this works with synonyms and simple relations-ships as one-to-many and
 
 The only collection currently supported is sqlalchemy.orm.collections.InstrumentedList.
 
+## Status
+
+No release, no version. This code should not be trusted.
+
 ## Usage
 
 Mixin iterachlemy.IterableModel in a declarative class or use it as a base class for declarative\_base. Each class can have the following attibutes set:
