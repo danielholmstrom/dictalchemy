@@ -19,7 +19,9 @@ Mixin iterachlemy.IterableModel in a declarative class or use it as a base class
 >>> user.asdict(exclude=['id'])
 {'name': 'Gerald'}
 >>> user.asdict(follow=['roles'])
-{'id': 3, 'name': 'Gerald', 'roles': [{'id': 'admin'}, {'id': 'user'}]}
+{'id': 3, 'name': 'Gerald', 'roles': [{'id': 1, 'name': 'admin'}, {'id': 2, 'name': 'user'}]}
+>>> user.asdict(follow={'roles': {'exclude': ['id']})
+{'id': 3, 'name': 'Gerald', 'roles': [{'name': 'admin'}, {'name': 'user'}]}
 ```
 
 See iteralchemy/test\_asdict.py for more examples.

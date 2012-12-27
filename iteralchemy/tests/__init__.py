@@ -14,6 +14,7 @@ engine = create_engine('sqlite:///:memory:', echo=False)
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base(engine, cls=IterableModel)
 
+
 class TestCase(unittest.TestCase):
 
     def setUp(self):
@@ -43,6 +44,7 @@ class NamedOtherColumnName(Base):
 
     def __init__(self, name):
         self.name = name
+
 
 class NamedWithSynonym(Base):
     __tablename__ = 'named_with_synonym'
@@ -123,6 +125,54 @@ class M2mRight(Base):
     id = Column(Integer, primary_key=True)
 
     name = Column(String)
+
+    def __init__(self, name):
+        self.name = name
+
+
+class MultipleChildChild1(Base):
+
+    __tablename__ = 'multiplechildchild1'
+
+    id = Column(Integer, primary_key=True)
+
+    name = Column(String)
+
+    def __init__(self, name):
+        self.name = name
+
+
+class MultipleChildChild2(Base):
+
+    __tablename__ = 'multiplechildchild2'
+
+    id = Column(Integer, primary_key=True)
+
+    name = Column(String)
+
+    def __init__(self, name):
+        self.name = name
+
+
+class MultipleChildParent(Base):
+
+    __tablename__ = 'multiplechildparent'
+
+    id = Column(Integer, primary_key=True)
+
+    name = Column(String)
+
+    _child1_id = Column(Integer, ForeignKey(MultipleChildChild1.id))
+
+    _child2_id = Column(Integer, ForeignKey(MultipleChildChild2.id))
+
+    child1 = relationship(MultipleChildChild1,
+        primaryjoin=_child1_id == MultipleChildChild1.id,
+            backref=backref('parent'))
+
+    child2 = relationship(MultipleChildChild2,
+        primaryjoin=_child2_id == MultipleChildChild2.id,
+            backref=backref('parent'))
 
     def __init__(self, name):
         self.name = name

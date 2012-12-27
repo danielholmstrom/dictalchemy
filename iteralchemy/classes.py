@@ -19,15 +19,27 @@ class IterableModel(object):
     def asdict(self, exclude=None, exclude_underscore=None, follow=None):
         """Get a dict from a model
 
-        :param follow: List of relationships that should be followed
+
+        :param follow: List or dict of relationships that should be followed.
+        If the parameter is a dict the value should be a dict of keyword
+        arguments.
         :param exclude: List of properties that should be excluded, will be
         merged with self.asdict_exclude
         :param exclude_underscore: Overides self.exclude_underscore if set
 
+        :raises: ValueError if follow contains a non-existent relationship
+
         :returns: dict
         """
 
-        follow = follow or []
+        if follow == None:
+            follow = []
+        try:
+            follow = dict(follow)
+        except ValueError:
+            follow = dict.fromkeys(list(follow), {})
+
+
         exclude = exclude or []
         exclude += self.asdict_exclude or []
         if exclude_underscore is None:
@@ -48,13 +60,23 @@ class IterableModel(object):
 
         data = dict([(k, getattr(self, k)) for k in columns + synonyms\
                 if k not in exclude])
-        if follow:
-            for k in relations:
-                rel = getattr(self, k)
-                if hasattr(rel, 'asdict'):
-                    data.update({k: rel.asdict()})
-                elif isinstance(rel, InstrumentedList):
-                    data.update({k: [dict(i) for i in rel]})
+
+        for (k, args) in follow.iteritems():
+            if k not in relations:
+                raise ValueError(\
+                        "Key '%r' in parameter 'follow' is not a relations" %\
+                        k)
+            rel = getattr(self, k)
+            if hasattr(rel, 'asdict'):
+                data.update({k: rel.asdict(**args)})
+            elif isinstance(rel, InstrumentedList):
+                children = []
+                for child in rel:
+                    if hasattr(child, 'asdict'):
+                        children.append(child.asdict(**args))
+                    else:
+                        children.append(dict(child))
+                data.update({k: children})
 
         return data
 
