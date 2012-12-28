@@ -7,8 +7,13 @@ from sqlalchemy.orm.collections import InstrumentedList
 
 from iteralchemy import constants
 
+
 def _prepare_arguments(self, exclude=None, exclude_underscore=None,
         follow=None):
+    """Prepare values for asdict and fromdict
+
+    :returns: A tuple with prepared values
+    """
 
     if follow == None:
         follow = []
@@ -31,11 +36,23 @@ def _prepare_arguments(self, exclude=None, exclude_underscore=None,
     synonyms = [k.key for k in self.__mapper__.iterate_properties if
             isinstance(k, SynonymProperty)]
 
+    # Find primary keys
+    primary_keys = set()
+    for k in self.__mapper__.iterate_properties:
+        if hasattr(k, 'columns'):
+            for c in k.columns:
+                if c.primary_key:
+                    primary_keys.add(k.key)
+
+    # TODO: Fix this bug, exclude_underscore is set above, that should be
+    # checked there
     if getattr(self, 'asdict_exclude_underscore', True):
         # Exclude everything starting with underscore
         exclude += [k for k in self.__mapper__._props if k[0] == '_']
 
-    return exclude, exclude_underscore, follow, relations, columns, synonyms
+    return exclude, exclude_underscore, follow, relations, columns, synonyms,\
+            primary_keys
+
 
 def asdict(self, exclude=None, exclude_underscore=None, follow=None):
     """Get a dict from a model
@@ -54,7 +71,8 @@ def asdict(self, exclude=None, exclude_underscore=None, follow=None):
     :returns: dict
     """
 
-    exclude, exclude_underscore, follow, relations, columns, synonyms =\
+    exclude, exclude_underscore, follow, relations, columns, synonyms,\
+            primary_keys =\
         _prepare_arguments(self, exclude, exclude_underscore, follow)
 
     data = dict([(k, getattr(self, k)) for k in columns + synonyms\
@@ -78,6 +96,20 @@ def asdict(self, exclude=None, exclude_underscore=None, follow=None):
             data.update({k: children})
 
     return data
+
+
+def fromdict(self, data, exclude=None, exclude_underscore=None, follow=None):
+
+    exclude, exclude_underscore, follow, relations, columns, synonyms,\
+            primary_keys =\
+            _prepare_arguments(self, exclude, exclude_underscore, follow)
+
+    # Update simple data
+    for k, v in data.iteritems():
+        if k in primary_keys:
+            raise Exception("Primary keys(%r) cannot be updated by fromdict" % k)
+        if k in columns:
+            setattr(self, k, v)
 
 
 def make_class_iterable(cls, exclude=constants.default_exclude,

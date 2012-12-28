@@ -15,6 +15,8 @@ class IterableModel(object):
 
     asdict = utils.asdict
 
+    fromdict = utils.fromdict
+
     def __iter__(self):
         """Iterates
 

@@ -36,6 +36,15 @@ class Named(Base):
         self.name = name
 
 
+class NamedWithOtherPk(Base):
+    __tablename__ = 'namedwithotherpk'
+    id = Column('other_id', Integer, primary_key=True)
+    name = Column(String)
+
+    def __init__(self, name):
+        self.name = name
+
+
 class NamedOtherColumnName(Base):
     __tablename__ = 'named_with_other_column'
 
