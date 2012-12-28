@@ -44,9 +44,7 @@ def _prepare_arguments(self, exclude=None, exclude_underscore=None,
                 if c.primary_key:
                     primary_keys.add(k.key)
 
-    # TODO: Fix this bug, exclude_underscore is set above, that should be
-    # checked there
-    if getattr(self, 'asdict_exclude_underscore', True):
+    if exclude_underscore:
         # Exclude everything starting with underscore
         exclude += [k for k in self.__mapper__._props if k[0] == '_']
 
