@@ -53,18 +53,19 @@ def _get_primary_key_properties(model):
 def asdict(self, exclude=None, exclude_underscore=None, follow=None):
     """Get a dict from a model
 
-    This method can also be set on a class directly
+    This method can also be set on a class directly.
 
-    :param follow: List or dict of relationships that should be followed.
-    If the parameter is a dict the value should be a dict of keyword
-    arguments.
-    :param exclude: List of properties that should be excluded, will be
-    merged with self.asdict_exclude.
-    :param exclude_underscore: Overides self.exclude_underscore if set.
+    :param follow: List or dict of relationships that should be followed. \
+            If the parameter is a dict the value should be a dict of \
+            keyword arguments.
+    :param exclude: List of properties that should be excluded, will be \
+            merged with self.asdict_exclude.
+    :param exclude_underscore: Overides self.exclude_underscore if set
 
-    :raises: ValueError if follow contains a non-existent relationship
+    :raises: :class:`ValueError` if follow contains a non-existent relationship
 
     :returns: dict
+
     """
 
     if follow == None:
@@ -122,13 +123,16 @@ def fromdict(self, data, exclude=None, exclude_underscore=None, follow=None):
 
     :param data: dict of data
     :param exclude: list of properties that should be excluded
-    :param exclude_underscore: If True underscore properties will be excluded,
-    if None self.asdict_exclude_underscore will be used.
-    :param follow: Dict of relations that should be followed, the key is the
-    arguments passed to the relation. Relations only works on simple relations,
-    not on lists.
+    :param exclude_underscore: If True underscore properties will be excluded,\
+            if set to None self.asdict_exclude_underscore will be used.
+    :param follow: Dict of relations that should be followed, the key is the \
+            arguments passed to the relation. Relations only works on simple \
+            relations, not on lists.
 
     :raises: :class:`Exception` If a primary key is in data
+
+    :returns nothing:
+
     """
 
     if follow == None:
@@ -185,8 +189,8 @@ def make_class_iterable(cls, exclude=constants.default_exclude,
     Warning: This method will overwrite existing attributes if they exists.
 
     :param exclude: Will be set as asdict_exclude on the class
-    :param exclud_underscore: Will be set as asdict_exclude_underscore on the
-    class
+    :param exclud_underscore: Will be set as asdict_exclude_underscore on \
+            the class
 
     :returns: The class
     """

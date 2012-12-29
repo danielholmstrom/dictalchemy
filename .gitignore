@@ -3,5 +3,6 @@
 *.mo
 *.egg-info
 .coverage
-doc/_build
+doc/build
+build
 \#*#

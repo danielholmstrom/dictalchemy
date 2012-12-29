@@ -21,8 +21,6 @@ A note about synonyms
 Synonyms wraps a reader and a writer method. These methods can do whatever they
 want to so there is no way to safely updated data with synonyms.
 
-
-
 """
 from __future__ import absolute_import, division
 
