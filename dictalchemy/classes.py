@@ -6,10 +6,12 @@ from dictalchemy import utils
 class DictableModel(object):
     """Adds iteration and asdict() method to an sqlalchemy class.
 
-    :ivar asdict_exclude: List of properties that should always be excluded.
-    :ivar asdict_exclude_underscore: If True properties starting with an \
+    :ivar dictalchemy_exclude: List of properties that should always be \
+            excluded.
+    :ivar dictalchemy_exclude_underscore: If True properties starting with an \
             underscore will always be excluded.
-    :ivar fromdict_allow_pk: If True the pk can be updated by fromdict.
+    :ivar dictalchemy_fromdict_allow_pk: If True the primary key can be \
+            updated by :meth:`dictalchemy.fromdict`.
 
     """
 

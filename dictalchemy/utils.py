@@ -60,7 +60,7 @@ def asdict(self, exclude=None, exclude_underscore=None, exclude_pk=None,
             If the parameter is a dict the value should be a dict of \
             keyword arguments.
     :param exclude: List of properties that should be excluded, will be \
-            merged with self.asdict_exclude.
+            merged with self.dictalchemy_exclude.
     :param exclude_pk: If True any column that refers to the primary key will \
             be excluded.
     :param exclude_underscore: Overides self.exclude_underscore if set
@@ -79,9 +79,10 @@ def asdict(self, exclude=None, exclude_underscore=None, exclude_pk=None,
         follow = dict.fromkeys(list(follow), {})
 
     exclude = exclude or []
-    exclude += getattr(self, 'asdict_exclude', constants.default_exclude) or []
+    exclude += getattr(self, 'dictalchemy_exclude', constants.default_exclude)\
+            or []
     if exclude_underscore is None:
-        exclude_underscore = getattr(self, 'asdict_exclude_underscore',
+        exclude_underscore = getattr(self, 'dictalchemy_exclude_underscore',
                 constants.default_exclude_underscore)
     if exclude_underscore:
         # Exclude all properties starting with underscore
@@ -130,9 +131,9 @@ def fromdict(self, data, exclude=None, exclude_underscore=None,
     :param data: dict of data
     :param exclude: list of properties that should be excluded
     :param exclude_underscore: If True underscore properties will be excluded,\
-            if set to None self.asdict_exclude_underscore will be used.
+            if set to None self.dictalchemy_exclude_underscore will be used.
     :param allow_pk: If True any column that refers to the primary key will \
-            be excluded. Defaults self.fromdict_allow_pk or \
+            be excluded. Defaults self.dictalchemy_fromdict_allow_pk or \
             dictable.constants.fromdict_allow_pk
     :param follow: Dict of relations that should be followed, the key is the \
             arguments passed to the relation. Relations only works on simple \
@@ -153,9 +154,10 @@ def fromdict(self, data, exclude=None, exclude_underscore=None,
         follow = dict.fromkeys(list(follow), {})
 
     exclude = exclude or []
-    exclude += getattr(self, 'asdict_exclude', constants.default_exclude) or []
+    exclude += getattr(self, 'dictalchemy_exclude', constants.default_exclude)\
+            or []
     if exclude_underscore is None:
-        exclude_underscore = getattr(self, 'asdict_exclude_underscore',
+        exclude_underscore = getattr(self, 'dictalchemy_exclude_underscore',
                 constants.default_exclude_underscore)
 
     if exclude_underscore:
@@ -164,7 +166,7 @@ def fromdict(self, data, exclude=None, exclude_underscore=None,
                 if k.key[0] == '_']
 
     if allow_pk is None:
-        allow_pk = getattr(self, 'fromdict_allow_pk',
+        allow_pk = getattr(self, 'dictalchemy_fromdict_allow_pk',
                 constants.default_fromdict_allow_pk)
 
     columns = get_column_keys(self)
@@ -175,8 +177,9 @@ def fromdict(self, data, exclude=None, exclude_underscore=None,
     # Update simple data
     for k, v in data.iteritems():
         if not allow_pk and k in primary_keys:
-            raise Exception("Primary key(%r) cannot be updated by fromdict" %\
-                    k)
+            raise Exception("Primary key(%r) cannot be updated by fromdict."
+                    "Set 'dictalchemy_fromdict_allow_pk' to True in your Model"
+                    " or pass 'allow_pk=True'." % k)
         if k in columns + synonyms:
             setattr(self, k, v)
 
@@ -203,16 +206,16 @@ def make_class_dictable(cls, exclude=constants.default_exclude,
 
     Warning: This method will overwrite existing attributes if they exists.
 
-    :param exclude: Will be set as asdict_exclude on the class
-    :param exclude_underscore: Will be set as asdict_exclude_underscore on \
-            the class
+    :param exclude: Will be set as dictalchemy_exclude on the class
+    :param exclude_underscore: Will be set as dictalchemy_exclude_underscore \
+            on the class
 
     :returns: The class
     """
 
-    setattr(cls, 'asdict_exclude', exclude)
-    setattr(cls, 'asdict_exclude_underscore', exclude_underscore)
-    setattr(cls, 'fromdict_allow_pk', fromdict_allow_pk)
+    setattr(cls, 'dictalchemy_exclude', exclude)
+    setattr(cls, 'dictalchemy_exclude_underscore', exclude_underscore)
+    setattr(cls, 'dictalchemy_fromdict_allow_pk', fromdict_allow_pk)
     setattr(cls, 'asdict', asdict)
     setattr(cls, 'fromdict', fromdict)
     return cls
