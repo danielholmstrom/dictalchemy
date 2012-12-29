@@ -117,7 +117,8 @@ def asdict(self, exclude=None, exclude_underscore=None, exclude_pk=None,
     return data
 
 
-def fromdict(self, data, exclude=None, exclude_underscore=None, follow=None):
+def fromdict(self, data, exclude=None, exclude_underscore=None,
+        allow_pk=None, follow=None):
     """Update a model from a dict
 
     This method updates the following properties on a model:
@@ -130,11 +131,15 @@ def fromdict(self, data, exclude=None, exclude_underscore=None, follow=None):
     :param exclude: list of properties that should be excluded
     :param exclude_underscore: If True underscore properties will be excluded,\
             if set to None self.asdict_exclude_underscore will be used.
+    :param allow_pk: If True any column that refers to the primary key will \
+            be excluded. Defaults self.fromdict_allow_pk or \
+            dictable.constants.fromdict_allow_pk
     :param follow: Dict of relations that should be followed, the key is the \
             arguments passed to the relation. Relations only works on simple \
             relations, not on lists.
 
-    :raises: :class:`Exception` If a primary key is in data
+    :raises: :class:`Exception` If a primary key is in data and \
+            allow_pk is False
 
     :returns nothing:
 
@@ -158,6 +163,10 @@ def fromdict(self, data, exclude=None, exclude_underscore=None, follow=None):
         exclude += [k.key for k in self.__mapper__.iterate_properties\
                 if k.key[0] == '_']
 
+    if allow_pk is None:
+        allow_pk = getattr(self, 'fromdict_allow_pk',
+                constants.default_fromdict_allow_pk)
+
     columns = get_column_keys(self)
     synonyms = get_synonym_keys(self)
     relations = get_relation_keys(self)
@@ -165,7 +174,7 @@ def fromdict(self, data, exclude=None, exclude_underscore=None, follow=None):
 
     # Update simple data
     for k, v in data.iteritems():
-        if k in primary_keys:
+        if not allow_pk and k in primary_keys:
             raise Exception("Primary key(%r) cannot be updated by fromdict" %\
                     k)
         if k in columns + synonyms:
@@ -185,7 +194,8 @@ def fromdict(self, data, exclude=None, exclude_underscore=None, follow=None):
 
 
 def make_class_dictable(cls, exclude=constants.default_exclude,
-        exclude_underscore=constants.default_exclude_underscore):
+        exclude_underscore=constants.default_exclude_underscore,
+        fromdict_allow_pk=constants.default_fromdict_allow_pk):
     """Make a class dictable
 
     Useful for when the Base class is already defined, for example when using
@@ -202,6 +212,7 @@ def make_class_dictable(cls, exclude=constants.default_exclude,
 
     setattr(cls, 'asdict_exclude', exclude)
     setattr(cls, 'asdict_exclude_underscore', exclude_underscore)
+    setattr(cls, 'fromdict_allow_pk', fromdict_allow_pk)
     setattr(cls, 'asdict', asdict)
     setattr(cls, 'fromdict', fromdict)
     return cls

@@ -9,6 +9,7 @@ class DictableModel(object):
     :ivar asdict_exclude: List of properties that should always be excluded.
     :ivar asdict_exclude_underscore: If True properties starting with an \
             underscore will always be excluded.
+    :ivar fromdict_allow_pk: If True the pk can be updated by fromdict.
 
     """
 

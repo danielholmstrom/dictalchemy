@@ -5,4 +5,5 @@ from __future__ import absolute_import, division
 default_exclude = None
 """Default value for asdict_exclude"""
 default_exclude_underscore = True
-"""Default value for asdict_exclude_underscore if not set"""
+"""Default value for fromdict_allow_pk if not set"""
+default_fromdict_allow_pk = False

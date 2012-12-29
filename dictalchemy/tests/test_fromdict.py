@@ -35,6 +35,15 @@ class TestFromdict(TestCase):
         else:
             assert False
 
+    def test_fromdict_allow_pk(self):
+        s = self.session
+        named = Named('a name')
+        s.add(named)
+        s.commit()
+        new = {'id': 7}
+        named.fromdict(new, allow_pk=True)
+        assert named.asdict() == {'id': new['id'], 'name': named.name}
+
     def test_simple_aborts_on_named_pk_1(self):
         s = self.session
         named = NamedWithOtherPk('a name')
