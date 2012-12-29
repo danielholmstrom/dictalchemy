@@ -8,48 +8,46 @@ from sqlalchemy.orm.collections import InstrumentedList
 from iteralchemy import constants
 
 
-def _prepare_arguments(self, exclude=None, exclude_underscore=None,
-        follow=None):
-    """Prepare values for asdict and fromdict
+def get_relation_keys(model):
+    """Get relation keys for a model
 
-    :returns: A tuple with prepared values
+    :returns: List of RelationProperties
     """
-
-    if follow == None:
-        follow = []
-    try:
-        follow = dict(follow)
-    except ValueError:
-        follow = dict.fromkeys(list(follow), {})
-
-    exclude = exclude or []
-    exclude += getattr(self, 'asdict_exclude', constants.default_exclude) or []
-    if exclude_underscore is None:
-        exclude_underscore = getattr(self, 'asdict_exclude_underscore',
-                constants.default_exclude_underscore)
-
-    # Get relationships, columns and synonyms
-    relations = [k.key for k in self.__mapper__.iterate_properties if
+    return [k.key for k in model.__mapper__.iterate_properties if
             isinstance(k, RelationshipProperty)]
-    columns = [k.key for k in self.__mapper__.iterate_properties if
+
+
+def get_column_keys(model):
+    """Get column keys for a model
+
+    :returns: List of column keys
+    """
+    return [k.key for k in model.__mapper__.iterate_properties if
             isinstance(k, ColumnProperty)]
-    synonyms = [k.key for k in self.__mapper__.iterate_properties if
+
+
+def get_synonym_keys(model):
+    """Get synonym keys for a model
+
+    :returns: List of keys for synonyms
+    """
+    return [k.key for k in model.__mapper__.iterate_properties if
             isinstance(k, SynonymProperty)]
 
+
+def _get_primary_key_properties(model):
+    """Get the column properties that affects a primary key
+
+    :returns: Set of column keys
+    """
     # Find primary keys
     primary_keys = set()
-    for k in self.__mapper__.iterate_properties:
+    for k in model.__mapper__.iterate_properties:
         if hasattr(k, 'columns'):
             for c in k.columns:
                 if c.primary_key:
                     primary_keys.add(k.key)
-
-    if exclude_underscore:
-        # Exclude everything starting with underscore
-        exclude += [k for k in self.__mapper__._props if k[0] == '_']
-
-    return exclude, exclude_underscore, follow, relations, columns, synonyms,\
-            primary_keys
+    return primary_keys
 
 
 def asdict(self, exclude=None, exclude_underscore=None, follow=None):
@@ -69,9 +67,26 @@ def asdict(self, exclude=None, exclude_underscore=None, follow=None):
     :returns: dict
     """
 
-    exclude, exclude_underscore, follow, relations, columns, synonyms,\
-            primary_keys =\
-        _prepare_arguments(self, exclude, exclude_underscore, follow)
+    if follow == None:
+        follow = []
+    try:
+        follow = dict(follow)
+    except ValueError:
+        follow = dict.fromkeys(list(follow), {})
+
+    exclude = exclude or []
+    exclude += getattr(self, 'asdict_exclude', constants.default_exclude) or []
+    if exclude_underscore is None:
+        exclude_underscore = getattr(self, 'asdict_exclude_underscore',
+                constants.default_exclude_underscore)
+    if exclude_underscore:
+        # Exclude all properties starting with underscore
+        exclude += [k.key for k in self.__mapper__.iterate_properties\
+                if k.key[0] == '_']
+
+    columns = get_column_keys(self)
+    synonyms = get_synonym_keys(self)
+    relations = get_relation_keys(self)
 
     data = dict([(k, getattr(self, k)) for k in columns + synonyms\
             if k not in exclude])
@@ -97,17 +112,67 @@ def asdict(self, exclude=None, exclude_underscore=None, follow=None):
 
 
 def fromdict(self, data, exclude=None, exclude_underscore=None, follow=None):
+    """Update a model from a dict
 
-    exclude, exclude_underscore, follow, relations, columns, synonyms,\
-            primary_keys =\
-            _prepare_arguments(self, exclude, exclude_underscore, follow)
+    This method updates the following properties on a model:
+
+    * Simple columns
+    * Synonyms
+    * Simple 1-m relationships
+
+    :param data: dict of data
+    :param exclude: list of properties that should be excluded
+    :param exclude_underscore: If True underscore properties will be excluded,
+    if None self.asdict_exclude_underscore will be used.
+    :param follow: Dict of relations that should be followed, the key is the
+    arguments passed to the relation. Relations only works on simple relations,
+    not on lists.
+
+    :raises: :class:`Exception` If a primary key is in data
+    """
+
+    if follow == None:
+        follow = []
+    try:
+        follow = dict(follow)
+    except ValueError:
+        follow = dict.fromkeys(list(follow), {})
+
+    exclude = exclude or []
+    exclude += getattr(self, 'asdict_exclude', constants.default_exclude) or []
+    if exclude_underscore is None:
+        exclude_underscore = getattr(self, 'asdict_exclude_underscore',
+                constants.default_exclude_underscore)
+
+    if exclude_underscore:
+        # Exclude all properties starting with underscore
+        exclude += [k.key for k in self.__mapper__.iterate_properties\
+                if k.key[0] == '_']
+
+    columns = get_column_keys(self)
+    synonyms = get_synonym_keys(self)
+    relations = get_relation_keys(self)
+    primary_keys = _get_primary_key_properties(self)
 
     # Update simple data
     for k, v in data.iteritems():
         if k in primary_keys:
-            raise Exception("Primary keys(%r) cannot be updated by fromdict" % k)
-        if k in columns:
+            raise Exception("Primary key(%r) cannot be updated by fromdict" %\
+                    k)
+        if k in columns + synonyms:
             setattr(self, k, v)
+
+    # Update simple relations
+    for (k, args) in follow.iteritems():
+        if k not in data:
+            continue
+        if k not in relations:
+            raise ValueError(\
+                    "Key '%r' in parameter 'follow' is not a relations" %\
+                    k)
+        rel = getattr(self, k)
+        if hasattr(rel, 'asdict'):
+            rel.fromdict(data[k], **args)
 
 
 def make_class_iterable(cls, exclude=constants.default_exclude,
@@ -129,4 +194,5 @@ def make_class_iterable(cls, exclude=constants.default_exclude,
     setattr(cls, 'asdict_exclude', exclude)
     setattr(cls, 'asdict_exclude_underscore', exclude_underscore)
     setattr(cls, 'asdict', asdict)
+    setattr(cls, 'fromdict', fromdict)
     return cls

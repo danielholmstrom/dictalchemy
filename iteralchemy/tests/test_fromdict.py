@@ -43,7 +43,23 @@ class TestFromdict(TestCase):
         new = {'id': 7}
         try:
             named.fromdict(new)
-        except Exception, e:
-            print 'Failed as it should', e
-        else:
             assert False
+        except Exception, e:
+            assert True, str(e)
+
+
+    def test_one_to_many_plain(self):
+        child = OneToManyChild('child')
+        self.session.add(child)
+        parent = OneToManyParent('parent')
+        parent.child = child
+        self.session.add(parent)
+        self.session.commit()
+
+        parent.fromdict({'name': 'Parent new name',\
+                'child': {'name': 'Child new name'}}, follow=['child'])
+        result = parent.asdict(follow=['child'])
+        expected = {'id': parent.id, 'name': 'Parent new name',\
+                'child': {'id': child.id, 'name': 'Child new name'}}
+
+        assert result == expected, "%r == %r" % (result, expected)
