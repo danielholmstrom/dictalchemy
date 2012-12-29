@@ -28,6 +28,9 @@ test_requires = install_requires
 
 setup(name='dictalchemy',
     version='0.1a1',
+    description="Contains asdict and fromdict methods for SQL-Alchemy "
+            "declarative models",
+    long_description=__doc__,
     url='http://github.com/danielholmstrom/dictalchemy/',
     license='MIT',
     author='Daniel Holmstrom',
@@ -36,7 +39,6 @@ setup(name='dictalchemy',
     classifiers=['Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License'],
-    long_description=__doc__,
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
