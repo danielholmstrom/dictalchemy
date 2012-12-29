@@ -37,6 +37,12 @@ class TestAsdict(TestCase):
         named = Named('a name')
         assert named.asdict(exclude=['id']) == {'name': 'a name'}
 
+    def test_exclude_pk(self):
+        named = Named('a name')
+        self.session.add(named)
+        self.session.commit()
+        assert named.asdict(exclude_pk=True) == {'name': named.name}
+
     def test_named_without_save(self):
         named = Named('a name')
         assert named.asdict() == {'id': None, 'name': named.name}

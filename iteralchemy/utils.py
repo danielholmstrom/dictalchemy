@@ -35,7 +35,7 @@ def get_synonym_keys(model):
             isinstance(k, SynonymProperty)]
 
 
-def _get_primary_key_properties(model):
+def get_primary_key_properties(model):
     """Get the column properties that affects a primary key
 
     :returns: Set of column keys
@@ -50,7 +50,8 @@ def _get_primary_key_properties(model):
     return primary_keys
 
 
-def asdict(self, exclude=None, exclude_underscore=None, follow=None):
+def asdict(self, exclude=None, exclude_underscore=None, exclude_pk=None,
+        follow=None):
     """Get a dict from a model
 
     This method can also be set on a class directly.
@@ -60,6 +61,8 @@ def asdict(self, exclude=None, exclude_underscore=None, follow=None):
             keyword arguments.
     :param exclude: List of properties that should be excluded, will be \
             merged with self.asdict_exclude.
+    :param exclude_pk: If True any column that refers to the primary key will \
+            be excluded.
     :param exclude_underscore: Overides self.exclude_underscore if set
 
     :raises: :class:`ValueError` if follow contains a non-existent relationship
@@ -84,6 +87,8 @@ def asdict(self, exclude=None, exclude_underscore=None, follow=None):
         # Exclude all properties starting with underscore
         exclude += [k.key for k in self.__mapper__.iterate_properties\
                 if k.key[0] == '_']
+    if exclude_pk is True:
+        exclude += get_primary_key_properties(self)
 
     columns = get_column_keys(self)
     synonyms = get_synonym_keys(self)
@@ -156,7 +161,7 @@ def fromdict(self, data, exclude=None, exclude_underscore=None, follow=None):
     columns = get_column_keys(self)
     synonyms = get_synonym_keys(self)
     relations = get_relation_keys(self)
-    primary_keys = _get_primary_key_properties(self)
+    primary_keys = get_primary_key_properties(self)
 
     # Update simple data
     for k, v in data.iteritems():
@@ -189,7 +194,7 @@ def make_class_iterable(cls, exclude=constants.default_exclude,
     Warning: This method will overwrite existing attributes if they exists.
 
     :param exclude: Will be set as asdict_exclude on the class
-    :param exclud_underscore: Will be set as asdict_exclude_underscore on \
+    :param exclude_underscore: Will be set as asdict_exclude_underscore on \
             the class
 
     :returns: The class
