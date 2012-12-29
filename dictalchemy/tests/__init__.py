@@ -1,7 +1,7 @@
 # vim: set fileencoding=utf-8 :
 from __future__ import absolute_import, division
 
-from iteralchemy import IterableModel
+from dictalchemy import DictableModel
 import unittest
 
 from sqlalchemy import create_engine
@@ -12,7 +12,7 @@ from sqlalchemy.orm import relationship, backref, synonym
 # Setup sqlalchemy
 engine = create_engine('sqlite:///:memory:', echo=False)
 from sqlalchemy.ext.declarative import declarative_base
-Base = declarative_base(engine, cls=IterableModel)
+Base = declarative_base(engine, cls=DictableModel)
 
 
 class TestCase(unittest.TestCase):

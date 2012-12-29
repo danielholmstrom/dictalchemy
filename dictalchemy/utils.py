@@ -5,7 +5,7 @@ from sqlalchemy.orm import RelationshipProperty, ColumnProperty,\
         SynonymProperty
 from sqlalchemy.orm.collections import InstrumentedList
 
-from iteralchemy import constants
+from dictalchemy import constants
 
 
 def get_relation_keys(model):
@@ -184,9 +184,9 @@ def fromdict(self, data, exclude=None, exclude_underscore=None, follow=None):
             rel.fromdict(data[k], **args)
 
 
-def make_class_iterable(cls, exclude=constants.default_exclude,
+def make_class_dictable(cls, exclude=constants.default_exclude,
         exclude_underscore=constants.default_exclude_underscore):
-    """Make a class iterable
+    """Make a class dictable
 
     Useful for when the Base class is already defined, for example when using
     Flask-SQLAlchemy.

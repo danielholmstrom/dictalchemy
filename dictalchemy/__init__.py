@@ -24,7 +24,7 @@ want to so there is no way to safely updated data with synonyms.
 """
 from __future__ import absolute_import, division
 
-from iteralchemy.classes import IterableModel
-from iteralchemy.utils import make_class_iterable, asdict
+from dictalchemy.classes import DictableModel
+from dictalchemy.utils import make_class_dictable, asdict
 
-__all__ = [IterableModel, make_class_iterable, asdict]
+__all__ = [DictableModel, make_class_dictable, asdict]

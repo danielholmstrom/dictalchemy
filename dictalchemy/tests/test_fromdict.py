@@ -3,7 +3,7 @@ from __future__ import absolute_import, division
 
 # vim: set fileencoding=utf-8 :
 from __future__ import absolute_import, division
-from iteralchemy.tests import TestCase, Named, NamedWithOtherPk,\
+from dictalchemy.tests import TestCase, Named, NamedWithOtherPk,\
         NamedOtherColumnName,\
         NamedWithSynonym, OneToManyChild, OneToManyParent,\
         M2mLeft, M2mRight,\

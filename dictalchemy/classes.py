@@ -1,9 +1,9 @@
 # vim: set fileencoding=utf-8 :
 from __future__ import absolute_import, division
 
-from iteralchemy import utils
+from dictalchemy import utils
 
-class IterableModel(object):
+class DictableModel(object):
     """Adds iteration and asdict() method to an sqlalchemy class.
 
     :ivar asdict_exclude: List of properties that should always be excluded.

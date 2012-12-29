@@ -10,9 +10,9 @@ No release, no version. This code should not be trusted.
 
 ## Usage
 
-### IterableModel
+### DictableModel
 
-Mixin iterachlemy.IterableModel in a declarative class or use it as a base class for declarative\_base. Each class can have the following attibutes set:
+Mixin dictalchemy.DictableModel in a declarative class or use it as a base class for declarative\_base. Each class can have the following attibutes set:
 
 * asdict\_exclude: List of properties that should be excluded by default(default empty)
 * asdict\_exclude\_underscore: Exclude properties starting with an underscore(default True)
@@ -24,8 +24,8 @@ This method can be run on existing classes to make them iterable.
 ## Examples
 
 ```
->>> from iteralchemy import make_class_iterable
->>> make_class_iterable(Base)
+>>> from iteralchemy import make_class_dictable
+>>> make_class_dictable(Base)
 >>> user = session.query(User).first()
 >>> dict(user)
 {'id': 3, 'name': 'Gerald'}
@@ -39,11 +39,11 @@ This method can be run on existing classes to make them iterable.
 {'id': 3, 'name': 'Gerald', 'roles': [{'name': 'admin', 'group': {'id': 1, 'name': 'admin'}}, {'name': 'user', 'group': {'id': 2, 'name': 'user'}}]}
 ```
 
-See iteralchemy/test\_asdict.py for more examples.
+See dictalchemy/test\_asdict.py for more examples.
 
 ## License
 
-iteralchemy is released under the MIT license.
+dictalchemy is released under the MIT license.
 
 
 ## TODO

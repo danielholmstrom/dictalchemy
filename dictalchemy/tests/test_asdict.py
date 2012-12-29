@@ -1,6 +1,6 @@
 # vim: set fileencoding=utf-8 :
 from __future__ import absolute_import, division
-from iteralchemy.tests import TestCase, Named, NamedOtherColumnName,\
+from dictalchemy.tests import TestCase, Named, NamedOtherColumnName,\
         NamedWithSynonym, OneToManyChild, OneToManyParent,\
         M2mLeft, M2mRight,\
         MultipleChildParent, MultipleChildChild1, MultipleChildChild2,\
