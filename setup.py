@@ -1,10 +1,13 @@
 """
-Setup the package
+~~~~~~~~~~~
+Dictalchemy
+~~~~~~~~~~~
 
-`include_package_data' will add all files in MANIFEST.in that is prefixed
-'recursive-include'.
+Contains asdict() and fromdict() methods that will work on SQLAlchemy declarative models.
 
+Read more in the source or on github <https://github.com/danielholmstrom/dictalchemy>.
 """
+
 import os
 from setuptools import find_packages
 from distutils.core import setup
@@ -23,13 +26,21 @@ install_requires = ['Sphinx==1.1.3',
 # Requirement for running tests
 test_requires = install_requires
 
-setup(name='Iteralchemy',
-    version='0.1',
-    long_description=README,
+setup(name='dictalchemy',
+    version='0.1a1',
+    url='http://github.com/danielholmstrom/dictalchemy/',
+    license='MIT',
+    author='Daniel Holmstrom',
+    author_email='holmstrom.daniel@gmail.com',
+    platforms='any',
+    classifiers=['Development Status :: 2 - Pre-Alpha',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License'],
+    long_description=__doc__,
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
     install_requires=install_requires,
     tests_require=test_requires,
-    test_suite='iteralchemy',
+    test_suite='dictalchemy',
     )
