@@ -196,6 +196,12 @@ def fromdict(self, data, exclude=None, exclude_underscore=None,
             rel.fromdict(data[k], **args)
 
 
+def iter(model):
+    """iter method for models"""
+    for i in model.asdict().iteritems():
+        yield i
+
+
 def make_class_dictable(cls, exclude=constants.default_exclude,
         exclude_underscore=constants.default_exclude_underscore,
         fromdict_allow_pk=constants.default_fromdict_allow_pk):
@@ -218,4 +224,5 @@ def make_class_dictable(cls, exclude=constants.default_exclude,
     setattr(cls, 'dictalchemy_fromdict_allow_pk', fromdict_allow_pk)
     setattr(cls, 'asdict', asdict)
     setattr(cls, 'fromdict', fromdict)
+    setattr(cls, '__iter__', iter)
     return cls

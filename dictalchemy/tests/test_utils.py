@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division
 
 import unittest
+import dictalchemy.tests as tests
 from dictalchemy import make_class_dictable
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -44,3 +45,12 @@ class TestAsdict(unittest.TestCase):
         assert not hasattr(m, 'asdict')
         make_class_dictable(MakeClassDictable)
         assert m.asdict() == {'id': m.id, 'name': m.name}
+
+
+class TestMakeDictable(tests.TestCase):
+
+    def test_dict(self):
+        named = tests.Named('a name')
+        self.session.add(named)
+        self.session.commit()
+        assert dict(named) == {'id': named.id, 'name': 'a name'}

@@ -19,11 +19,4 @@ class DictableModel(object):
 
     fromdict = utils.fromdict
 
-    def __iter__(self):
-        """Iterates
-
-        Yields tuples that can be used to create a dict.
-
-        """
-        for i in self.asdict().iteritems():
-            yield i
+    __iter__ = utils.iter
