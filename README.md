@@ -8,7 +8,7 @@ The only collection currently supported is sqlalchemy.orm.collections.Instrument
 
 ## Status
 
-No release, no version. This code should not be trusted.
+No release, no version. This code should not be trusted. In pip there are versions but they should not be trusted until the final 0.1 relase.
 
 ## Usage
 
