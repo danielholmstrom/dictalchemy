@@ -3,6 +3,7 @@ from __future__ import absolute_import, division
 
 from dictalchemy import utils
 
+
 class DictableModel(object):
     """Adds iteration and asdict() method to an sqlalchemy class.
 

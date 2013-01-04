@@ -5,7 +5,7 @@
 Introduction
 ~~~~~~~~~~~~
 
-This library adds basic functionality for getting a dict from an SQLAlchemy 
+This library adds basic functionality for getting a dict from an SQLAlchemy
 model and updating a model from a dict.
 
 SQLAlchemy is a very complex library. It contains synonyms, lists, sets, mixins

@@ -79,8 +79,8 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
         follow = dict.fromkeys(list(follow), {})
 
     exclude = exclude or []
-    exclude += getattr(model, 'dictalchemy_exclude', constants.default_exclude)\
-            or []
+    exclude += getattr(model, 'dictalchemy_exclude',
+            constants.default_exclude) or []
     if exclude_underscore is None:
         exclude_underscore = getattr(model, 'dictalchemy_exclude_underscore',
                 constants.default_exclude_underscore)
@@ -154,8 +154,8 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
         follow = dict.fromkeys(list(follow), {})
 
     exclude = exclude or []
-    exclude += getattr(model, 'dictalchemy_exclude', constants.default_exclude)\
-            or []
+    exclude += getattr(model, 'dictalchemy_exclude',
+            constants.default_exclude) or []
     if exclude_underscore is None:
         exclude_underscore = getattr(model, 'dictalchemy_exclude_underscore',
                 constants.default_exclude_underscore)

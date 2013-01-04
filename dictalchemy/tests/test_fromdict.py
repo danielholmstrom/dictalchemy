@@ -56,7 +56,6 @@ class TestFromdict(TestCase):
         except Exception, e:
             assert True, str(e)
 
-
     def test_one_to_many_plain(self):
         child = OneToManyChild('child')
         self.session.add(child)
