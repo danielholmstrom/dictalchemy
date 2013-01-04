@@ -50,7 +50,7 @@ def get_primary_key_properties(model):
     return primary_keys
 
 
-def asdict(self, exclude=None, exclude_underscore=None, exclude_pk=None,
+def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
         follow=None):
     """Get a dict from a model
 
@@ -60,10 +60,10 @@ def asdict(self, exclude=None, exclude_underscore=None, exclude_pk=None,
             If the parameter is a dict the value should be a dict of \
             keyword arguments.
     :param exclude: List of properties that should be excluded, will be \
-            merged with self.dictalchemy_exclude.
+            merged with model.dictalchemy_exclude.
     :param exclude_pk: If True any column that refers to the primary key will \
             be excluded.
-    :param exclude_underscore: Overides self.exclude_underscore if set
+    :param exclude_underscore: Overides model.exclude_underscore if set
 
     :raises: :class:`ValueError` if follow contains a non-existent relationship
 
@@ -79,23 +79,23 @@ def asdict(self, exclude=None, exclude_underscore=None, exclude_pk=None,
         follow = dict.fromkeys(list(follow), {})
 
     exclude = exclude or []
-    exclude += getattr(self, 'dictalchemy_exclude', constants.default_exclude)\
+    exclude += getattr(model, 'dictalchemy_exclude', constants.default_exclude)\
             or []
     if exclude_underscore is None:
-        exclude_underscore = getattr(self, 'dictalchemy_exclude_underscore',
+        exclude_underscore = getattr(model, 'dictalchemy_exclude_underscore',
                 constants.default_exclude_underscore)
     if exclude_underscore:
         # Exclude all properties starting with underscore
-        exclude += [k.key for k in self.__mapper__.iterate_properties\
+        exclude += [k.key for k in model.__mapper__.iterate_properties\
                 if k.key[0] == '_']
     if exclude_pk is True:
-        exclude += get_primary_key_properties(self)
+        exclude += get_primary_key_properties(model)
 
-    columns = get_column_keys(self)
-    synonyms = get_synonym_keys(self)
-    relations = get_relation_keys(self)
+    columns = get_column_keys(model)
+    synonyms = get_synonym_keys(model)
+    relations = get_relation_keys(model)
 
-    data = dict([(k, getattr(self, k)) for k in columns + synonyms\
+    data = dict([(k, getattr(model, k)) for k in columns + synonyms\
             if k not in exclude])
 
     for (k, args) in follow.iteritems():
@@ -103,7 +103,7 @@ def asdict(self, exclude=None, exclude_underscore=None, exclude_pk=None,
             raise ValueError(\
                     "Key '%r' in parameter 'follow' is not a relations" %\
                     k)
-        rel = getattr(self, k)
+        rel = getattr(model, k)
         if hasattr(rel, 'asdict'):
             data.update({k: rel.asdict(**args)})
         elif isinstance(rel, InstrumentedList):
@@ -118,7 +118,7 @@ def asdict(self, exclude=None, exclude_underscore=None, exclude_pk=None,
     return data
 
 
-def fromdict(self, data, exclude=None, exclude_underscore=None,
+def fromdict(model, data, exclude=None, exclude_underscore=None,
         allow_pk=None, follow=None):
     """Update a model from a dict
 
@@ -131,9 +131,9 @@ def fromdict(self, data, exclude=None, exclude_underscore=None,
     :param data: dict of data
     :param exclude: list of properties that should be excluded
     :param exclude_underscore: If True underscore properties will be excluded,\
-            if set to None self.dictalchemy_exclude_underscore will be used.
+            if set to None model.dictalchemy_exclude_underscore will be used.
     :param allow_pk: If True any column that refers to the primary key will \
-            be excluded. Defaults self.dictalchemy_fromdict_allow_pk or \
+            be excluded. Defaults model.dictalchemy_fromdict_allow_pk or \
             dictable.constants.fromdict_allow_pk
     :param follow: Dict of relations that should be followed, the key is the \
             arguments passed to the relation. Relations only works on simple \
@@ -154,25 +154,25 @@ def fromdict(self, data, exclude=None, exclude_underscore=None,
         follow = dict.fromkeys(list(follow), {})
 
     exclude = exclude or []
-    exclude += getattr(self, 'dictalchemy_exclude', constants.default_exclude)\
+    exclude += getattr(model, 'dictalchemy_exclude', constants.default_exclude)\
             or []
     if exclude_underscore is None:
-        exclude_underscore = getattr(self, 'dictalchemy_exclude_underscore',
+        exclude_underscore = getattr(model, 'dictalchemy_exclude_underscore',
                 constants.default_exclude_underscore)
 
     if exclude_underscore:
         # Exclude all properties starting with underscore
-        exclude += [k.key for k in self.__mapper__.iterate_properties\
+        exclude += [k.key for k in model.__mapper__.iterate_properties\
                 if k.key[0] == '_']
 
     if allow_pk is None:
-        allow_pk = getattr(self, 'dictalchemy_fromdict_allow_pk',
+        allow_pk = getattr(model, 'dictalchemy_fromdict_allow_pk',
                 constants.default_fromdict_allow_pk)
 
-    columns = get_column_keys(self)
-    synonyms = get_synonym_keys(self)
-    relations = get_relation_keys(self)
-    primary_keys = get_primary_key_properties(self)
+    columns = get_column_keys(model)
+    synonyms = get_synonym_keys(model)
+    relations = get_relation_keys(model)
+    primary_keys = get_primary_key_properties(model)
 
     # Update simple data
     for k, v in data.iteritems():
@@ -181,7 +181,7 @@ def fromdict(self, data, exclude=None, exclude_underscore=None,
                     "Set 'dictalchemy_fromdict_allow_pk' to True in your Model"
                     " or pass 'allow_pk=True'." % k)
         if k in columns + synonyms:
-            setattr(self, k, v)
+            setattr(model, k, v)
 
     # Update simple relations
     for (k, args) in follow.iteritems():
@@ -191,7 +191,7 @@ def fromdict(self, data, exclude=None, exclude_underscore=None,
             raise ValueError(\
                     "Key '%r' in parameter 'follow' is not a relations" %\
                     k)
-        rel = getattr(self, k)
+        rel = getattr(model, k)
         if hasattr(rel, 'asdict'):
             rel.fromdict(data[k], **args)
 
