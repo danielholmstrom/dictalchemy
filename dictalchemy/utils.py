@@ -215,6 +215,8 @@ def make_class_dictable(cls, exclude=constants.default_exclude,
     :param exclude: Will be set as dictalchemy_exclude on the class
     :param exclude_underscore: Will be set as dictalchemy_exclude_underscore \
             on the class
+    :param formdict_allow_pk: Will be set as dictalchemy_fromdict_allow_pk\
+            on the class
 
     :returns: The class
     """
