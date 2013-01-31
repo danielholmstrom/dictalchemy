@@ -66,7 +66,7 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
     :param exclude_underscore: Overides model.exclude_underscore if set
     :param include: List of properties that should be included. Use this to \
             allow python properties to be called. This list will be merged \
-            with model.dictalchemy_include.
+            with model.dictalchemy_asdict_include.
 
     :raises: :class:`ValueError` if follow contains a non-existent relationship
 
@@ -94,8 +94,8 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
     if exclude_pk is True:
         exclude += get_primary_key_properties(model)
 
-    include = (include or []) + (getattr(model, 'dictalchemy_include', None)
-            or [])
+    include = (include or []) + (getattr(model,
+        'dictalchemy_asdict_include', None) or [])
 
     columns = get_column_keys(model)
     synonyms = get_synonym_keys(model)
@@ -215,7 +215,7 @@ def iter(model):
 def make_class_dictable(cls, exclude=constants.default_exclude,
         exclude_underscore=constants.default_exclude_underscore,
         fromdict_allow_pk=constants.default_fromdict_allow_pk,
-        include=None, fromdict_include=None):
+        asdict_include=None, fromdict_include=None):
     """Make a class dictable
 
     Useful for when the Base class is already defined, for example when using
@@ -228,7 +228,8 @@ def make_class_dictable(cls, exclude=constants.default_exclude,
             on the class
     :param fromdict_allow_pk: Will be set as dictalchemy_fromdict_allow_pk\
             on the class
-    :param include: Will be set as dictalchemy_include on the class
+    :param asdict_include: Will be set as dictalchemy_asdict_include on the \
+            class
     :param fromdict_include: Will be set as dictalchemy_fromdict_include on \
             the class
 
@@ -241,6 +242,6 @@ def make_class_dictable(cls, exclude=constants.default_exclude,
     setattr(cls, 'asdict', asdict)
     setattr(cls, 'fromdict', fromdict)
     setattr(cls, '__iter__', iter)
-    setattr(cls, 'dictalchemy_include', include)
+    setattr(cls, 'dictalchemy_asdict_include', asdict_include)
     setattr(cls, 'dictalchemy_fromdict_include', fromdict_include)
     return cls

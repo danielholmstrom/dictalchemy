@@ -229,7 +229,7 @@ class WithDefaultInclude(Base):
 
     __tablename__ = 'withdefaultinclude'
 
-    dictalchemy_include = ['id_alias']
+    dictalchemy_asdict_include = ['id_alias']
 
     dictalchemy_fromdict_include = ['id_alias']
 
