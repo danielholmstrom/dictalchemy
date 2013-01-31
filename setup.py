@@ -27,7 +27,7 @@ install_requires = ['Sphinx==1.1.3',
 test_requires = install_requires
 
 setup(name='dictalchemy',
-    version='0.1a2',
+    version='0.1a3',
     description="Contains asdict and fromdict methods for SQL-Alchemy "
             "declarative models",
     long_description=__doc__,
