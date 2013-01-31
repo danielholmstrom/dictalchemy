@@ -18,6 +18,7 @@ Mixin dictalchemy.DictableModel in a declarative class or use it as a base class
 
 * dictalchemy\_exclude: List of properties that should be excluded by default(default empty)
 * dictalchemy\_exclude\_underscore: Exclude properties starting with an underscore(default True)
+* dictalchemy\_include: List of properties that should be included by default(default empty)
 * dictalchemy\_fromdict\_allow\_pk: If True the primary key may be updated with fromdict()
 
 ## make\_class\_dictable()
@@ -64,6 +65,7 @@ This method can be run on existing classes to make them dictable.
 ```
 
 See dictalchemy/test\_asdict.py and dictalchemy/\_test\_asdict for more examples.
+
 
 ## License
 

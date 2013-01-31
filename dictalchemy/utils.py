@@ -51,7 +51,7 @@ def get_primary_key_properties(model):
 
 
 def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
-        follow=None):
+        follow=None, include=None):
     """Get a dict from a model
 
     This method can also be set on a class directly.
@@ -64,6 +64,9 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
     :param exclude_pk: If True any column that refers to the primary key will \
             be excluded.
     :param exclude_underscore: Overides model.exclude_underscore if set
+    :param include: List of properties that should be included. Use this to \
+            allow python properties to be called. This list will be merged \
+            with model.dictalchemy_include.
 
     :raises: :class:`ValueError` if follow contains a non-existent relationship
 
@@ -91,11 +94,14 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
     if exclude_pk is True:
         exclude += get_primary_key_properties(model)
 
+    include = (include or []) + (getattr(model, 'dictalchemy_include', None)
+            or [])
+
     columns = get_column_keys(model)
     synonyms = get_synonym_keys(model)
     relations = get_relation_keys(model)
 
-    data = dict([(k, getattr(model, k)) for k in columns + synonyms\
+    data = dict([(k, getattr(model, k)) for k in columns + synonyms + include\
             if k not in exclude])
 
     for (k, args) in follow.iteritems():
@@ -204,7 +210,8 @@ def iter(model):
 
 def make_class_dictable(cls, exclude=constants.default_exclude,
         exclude_underscore=constants.default_exclude_underscore,
-        fromdict_allow_pk=constants.default_fromdict_allow_pk):
+        fromdict_allow_pk=constants.default_fromdict_allow_pk,
+        include=None):
     """Make a class dictable
 
     Useful for when the Base class is already defined, for example when using
@@ -215,8 +222,9 @@ def make_class_dictable(cls, exclude=constants.default_exclude,
     :param exclude: Will be set as dictalchemy_exclude on the class
     :param exclude_underscore: Will be set as dictalchemy_exclude_underscore \
             on the class
-    :param formdict_allow_pk: Will be set as dictalchemy_fromdict_allow_pk\
+    :param fromdict_allow_pk: Will be set as dictalchemy_fromdict_allow_pk\
             on the class
+    :param include: Will be set as dictalchemy_include on the class
 
     :returns: The class
     """
@@ -227,4 +235,5 @@ def make_class_dictable(cls, exclude=constants.default_exclude,
     setattr(cls, 'asdict', asdict)
     setattr(cls, 'fromdict', fromdict)
     setattr(cls, '__iter__', iter)
+    setattr(cls, 'dictalchemy_include', include)
     return cls

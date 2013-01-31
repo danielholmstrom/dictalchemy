@@ -8,6 +8,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Table, Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship, backref, synonym
+from sqlalchemy.ext.hybrid import hybrid_property
+
 
 # Setup sqlalchemy
 engine = create_engine('sqlite:///:memory:', echo=False)
@@ -203,3 +205,37 @@ class MultipleChildParent(Base):
 
     def __init__(self, name):
         self.name = name
+
+
+class WithHybrid(Base):
+
+    __tablename__ = 'withhybrid'
+
+    _id = Column('id', Integer, primary_key=True)
+
+    @hybrid_property
+    def id(self):
+        return self._id
+
+    @id.setter
+    def set_id(self, value):
+        self._id = value
+
+    def __init__(self, id):
+        self.id = id
+
+
+class WithDefaultInclude(Base):
+
+    __tablename__ = 'withdefaultinclude'
+
+    dictalchemy_include = ['id_alias']
+
+    id = Column('id', Integer, primary_key=True)
+
+    @hybrid_property
+    def id_alias(self):
+        return self.id
+
+    def __init__(self, id):
+        self.id = id

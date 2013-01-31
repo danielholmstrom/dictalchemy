@@ -21,6 +21,16 @@ A note about synonyms
 Synonyms wraps a reader and a writer method. These methods can do whatever they
 want to so there is no way to safely updated data with synonyms.
 
+~~~~~~~~~~~~~~~~~~~~~~~~~
+Bugs and missing features
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This library is developed as a helper-library to another piece of software.
+What works for that software is also implemented and tested in dictalchemy.
+
+There are bugs and missing features in this library. Please don't hesitate to
+register issues at `github <https://github.com/danielholmstrom/dictalchemy>`_.
+
 """
 from __future__ import absolute_import, division
 

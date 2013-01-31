@@ -4,7 +4,7 @@ from dictalchemy.tests import TestCase, Named, NamedOtherColumnName,\
         NamedWithSynonym, OneToManyChild, OneToManyParent,\
         M2mLeft, M2mRight,\
         MultipleChildParent, MultipleChildChild1, MultipleChildChild2,\
-        MultipleChildChild1Child
+        MultipleChildChild1Child, WithHybrid, WithDefaultInclude
 
 
 class TestAsdict(TestCase):
@@ -136,3 +136,9 @@ class TestAsdict(TestCase):
                     {'id': p.id, 'name': p.name,
                 'child1': {'id': c1.id, 'name': c1.name,
                     'child': {'name': c1c.name}}}
+
+    def test_hybrid_property(self):
+        assert WithHybrid(2).asdict(include=['id']) == {'id': 2}
+
+    def test_default_include(self):
+        assert WithDefaultInclude(2).asdict() == {'id': 2, 'id_alias': 2}
