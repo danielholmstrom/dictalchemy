@@ -125,7 +125,7 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
 
 def fromdict(model, data, exclude=None, exclude_underscore=None,
-        allow_pk=None, follow=None):
+        allow_pk=None, follow=None, include=None):
     """Update a model from a dict
 
     This method updates the following properties on a model:
@@ -144,6 +144,7 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
     :param follow: Dict of relations that should be followed, the key is the \
             arguments passed to the relation. Relations only works on simple \
             relations, not on lists.
+    :param include: list of properties that should be included.
 
     :raises: :class:`Exception` If a primary key is in data and \
             allow_pk is False
@@ -175,6 +176,9 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
         allow_pk = getattr(model, 'dictalchemy_fromdict_allow_pk',
                 constants.default_fromdict_allow_pk)
 
+    include = (include or []) + (getattr(model,
+        'dictalchemy_fromdict_include', None) or [])
+
     columns = get_column_keys(model)
     synonyms = get_synonym_keys(model)
     relations = get_relation_keys(model)
@@ -186,7 +190,7 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
             raise Exception("Primary key(%r) cannot be updated by fromdict."
                     "Set 'dictalchemy_fromdict_allow_pk' to True in your Model"
                     " or pass 'allow_pk=True'." % k)
-        if k in columns + synonyms:
+        if k in columns + synonyms + include:
             setattr(model, k, v)
 
     # Update simple relations
@@ -211,7 +215,7 @@ def iter(model):
 def make_class_dictable(cls, exclude=constants.default_exclude,
         exclude_underscore=constants.default_exclude_underscore,
         fromdict_allow_pk=constants.default_fromdict_allow_pk,
-        include=None):
+        include=None, fromdict_include=None):
     """Make a class dictable
 
     Useful for when the Base class is already defined, for example when using
@@ -225,6 +229,8 @@ def make_class_dictable(cls, exclude=constants.default_exclude,
     :param fromdict_allow_pk: Will be set as dictalchemy_fromdict_allow_pk\
             on the class
     :param include: Will be set as dictalchemy_include on the class
+    :param fromdict_include: Will be set as dictalchemy_fromdict_include on \
+            the class
 
     :returns: The class
     """
@@ -236,4 +242,5 @@ def make_class_dictable(cls, exclude=constants.default_exclude,
     setattr(cls, 'fromdict', fromdict)
     setattr(cls, '__iter__', iter)
     setattr(cls, 'dictalchemy_include', include)
+    setattr(cls, 'dictalchemy_fromdict_include', fromdict_include)
     return cls

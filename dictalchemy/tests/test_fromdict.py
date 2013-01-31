@@ -8,7 +8,7 @@ from dictalchemy.tests import TestCase, Named, NamedWithOtherPk,\
         NamedWithSynonym, OneToManyChild, OneToManyParent,\
         M2mLeft, M2mRight,\
         MultipleChildParent, MultipleChildChild1, MultipleChildChild2,\
-        MultipleChildChild1Child
+        MultipleChildChild1Child, WithHybrid, WithDefaultInclude
 
 
 class TestFromdict(TestCase):
@@ -71,3 +71,14 @@ class TestFromdict(TestCase):
                 'child': {'id': child.id, 'name': 'Child new name'}}
 
         assert result == expected, "%r == %r" % (result, expected)
+
+    def test_include(self):
+        h = WithHybrid(1)
+        h.fromdict({'id': 17}, include=['id'])
+        assert h.id == 17
+
+    def test_default_include(self):
+        h = WithDefaultInclude(1)
+        h.fromdict({'id_alias': 4})
+        assert h.id_alias == 4
+

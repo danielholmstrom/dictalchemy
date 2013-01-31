@@ -231,11 +231,17 @@ class WithDefaultInclude(Base):
 
     dictalchemy_include = ['id_alias']
 
+    dictalchemy_fromdict_include = ['id_alias']
+
     id = Column('id', Integer, primary_key=True)
 
     @hybrid_property
     def id_alias(self):
         return self.id
+
+    @id_alias.setter
+    def set_id_alias(self, value):
+        self.id = value;
 
     def __init__(self, id):
         self.id = id
