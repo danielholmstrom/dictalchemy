@@ -149,7 +149,7 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
     :raises: :class:`Exception` If a primary key is in data and \
             allow_pk is False
 
-    :returns nothing:
+    :returns: The model
 
     """
 
@@ -205,6 +205,7 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
         if hasattr(rel, 'asdict'):
             rel.fromdict(data[k], **args)
 
+    return model
 
 def iter(model):
     """iter method for models"""
