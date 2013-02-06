@@ -6,6 +6,7 @@ from sqlalchemy.orm import RelationshipProperty, ColumnProperty,\
 from sqlalchemy.orm.collections import InstrumentedList, MappedCollection
 
 from dictalchemy import constants
+from dictalchemy import errors
 
 
 def get_relation_keys(model):
@@ -70,6 +71,8 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
             with model.dictalchemy_asdict_include.
 
     :raises: :class:`ValueError` if follow contains a non-existent relationship
+    :raises: :class:`dictalchemy.UnsupportedRelationError` If follow contains \
+            an existing relationship that currently isn't supported.
 
     :returns: dict
 
@@ -130,9 +133,7 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
                     children[child_key] = child.dict(child)
             data.update({k: children})
         else:
-            # Here we got a follow that couldn't be found.
-            # TODO: For now - throw an exception.
-            pass
+            raise errors.UnsupportedRelationError(k)
 
     return data
 
