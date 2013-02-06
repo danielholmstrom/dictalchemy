@@ -18,3 +18,17 @@ class UnsupportedRelationError(DictalchemyError):
 
     def __str__(self):
         return "Relation '%r' is not supported" % (self.relation_key,)
+
+
+class MissingRelationError(DictalchemyError):
+    """Raised when a relationship is missing
+
+    The name of the relation can be accessed from 'relation_key'
+    """
+
+    def __init__(self, relation_key):
+        self.relation_key = relation_key
+
+    def __str__(self):
+        return "Relation '%r' is not found" % (self.relation_key,)
+

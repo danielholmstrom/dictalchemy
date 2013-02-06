@@ -70,7 +70,8 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
             allow python properties to be called. This list will be merged \
             with model.dictalchemy_asdict_include.
 
-    :raises: :class:`ValueError` if follow contains a non-existent relationship
+    :raises: :class:`dictalchemy.MissingRelationError` \
+            If follow contains a non-existent relationship.
     :raises: :class:`dictalchemy.UnsupportedRelationError` If follow contains \
             an existing relationship that currently isn't supported.
 
@@ -110,9 +111,7 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
     for (k, args) in follow.iteritems():
         if k not in relations:
-            raise ValueError(\
-                    "Key '%r' in parameter 'follow' is not a relations" %\
-                    k)
+            raise errors.MissingRelationError(k)
         rel = getattr(model, k)
         if hasattr(rel, 'asdict'):
             data.update({k: rel.asdict(**args)})
@@ -212,9 +211,7 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
         if k not in data:
             continue
         if k not in relations:
-            raise ValueError(\
-                    "Key '%r' in parameter 'follow' is not a relations" %\
-                    k)
+            raise errors.MissingRelationError(k)
         rel = getattr(model, k)
         if hasattr(rel, 'asdict'):
             rel.fromdict(data[k], **args)
