@@ -4,7 +4,8 @@ from dictalchemy.tests import TestCase, Named, NamedOtherColumnName,\
         NamedWithSynonym, OneToManyChild, OneToManyParent,\
         M2mLeft, M2mRight,\
         MultipleChildParent, MultipleChildChild1, MultipleChildChild2,\
-        MultipleChildChild1Child, WithHybrid, WithDefaultInclude
+        MultipleChildChild1Child, WithHybrid, WithDefaultInclude,\
+        WithAttributeMappedCollection, WithAttributeMappedCollectionChild
 
 
 class TestAsdict(TestCase):
@@ -142,3 +143,10 @@ class TestAsdict(TestCase):
 
     def test_default_include(self):
         assert WithDefaultInclude(2).asdict() == {'id': 2, 'id_alias': 2}
+
+    def test_attribute_mapped_collection(self):
+        p = WithAttributeMappedCollection()
+        p.childs['child1'] = WithAttributeMappedCollectionChild('child1')
+        assert p.asdict(follow=['childs']) == {'childs':\
+                {'child1':\
+                {'parent_id': None, 'id': None, 'name': 'child1'}}, 'id': None}

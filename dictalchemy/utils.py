@@ -3,7 +3,7 @@ from __future__ import absolute_import, division
 
 from sqlalchemy.orm import RelationshipProperty, ColumnProperty,\
         SynonymProperty
-from sqlalchemy.orm.collections import InstrumentedList
+from sqlalchemy.orm.collections import InstrumentedList, MappedCollection
 
 from dictalchemy import constants
 
@@ -58,7 +58,8 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
     :param follow: List or dict of relationships that should be followed. \
             If the parameter is a dict the value should be a dict of \
-            keyword arguments.
+            keyword arguments. Currently it follows InstrumentedList,\
+            MappedCollection and regular 1:1, 1:m, m:m relationships.
     :param exclude: List of properties that should be excluded, will be \
             merged with model.dictalchemy_exclude.
     :param exclude_pk: If True any column that refers to the primary key will \
@@ -120,6 +121,18 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
                 else:
                     children.append(dict(child))
             data.update({k: children})
+        elif isinstance(rel, MappedCollection):
+            children = {}
+            for (child_key, child) in rel.iteritems():
+                if hasattr(child, 'asdict'):
+                    children[child_key] = child.asdict(**args)
+                else:
+                    children[child_key] = child.dict(child)
+            data.update({k: children})
+        else:
+            # Here we got a follow that couldn't be found.
+            # TODO: For now - throw an exception.
+            pass
 
     return data
 

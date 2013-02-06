@@ -9,6 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Table, Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship, backref, synonym
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm.collections import attribute_mapped_collection
 
 
 # Setup sqlalchemy
@@ -245,3 +246,29 @@ class WithDefaultInclude(Base):
 
     def __init__(self, id):
         self.id = id
+
+
+class WithAttributeMappedCollectionChild(Base):
+
+    __tablename__ = 'withattributemappedcollectionchild'
+
+    id = Column(Integer, primary_key=True)
+
+    name = Column(String, unique=True, nullable=False)
+
+    parent_id = Column(Integer, ForeignKey('withattributemappedcollection.id'))
+
+    def __init__(self, name):
+        self.name = name
+
+
+class WithAttributeMappedCollection(Base):
+
+    __tablename__ = 'withattributemappedcollection'
+
+    id = Column(Integer, primary_key=True)
+
+    childs = relationship(WithAttributeMappedCollectionChild,
+            collection_class=attribute_mapped_collection('name'),
+            cascade="all, delete-orphan",
+            backref=backref('parents')) 
