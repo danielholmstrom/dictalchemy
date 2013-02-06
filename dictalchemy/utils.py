@@ -159,8 +159,8 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
             relations, not on lists.
     :param include: list of properties that should be included.
 
-    :raises: :class:`Exception` If a primary key is in data and \
-            allow_pk is False
+    :raises: :class:`dictalchemy.DictalchemyError` If a primary key is in \
+            data and allow_pk is False
 
     :returns: The model
 
@@ -200,7 +200,8 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
     # Update simple data
     for k, v in data.iteritems():
         if not allow_pk and k in primary_keys:
-            raise Exception("Primary key(%r) cannot be updated by fromdict."
+            raise errors.DictalchemyError(\
+                    "Primary key(%r) cannot be updated by fromdict."
                     "Set 'dictalchemy_fromdict_allow_pk' to True in your Model"
                     " or pass 'allow_pk=True'." % k)
         if k in columns + synonyms + include:
