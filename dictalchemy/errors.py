@@ -2,6 +2,7 @@
 """Contains errors used by dictalchemy"""
 from __future__ import absolute_import, division
 
+
 class DictalchemyError(Exception):
     """Base class for Dictalchemy"""
     pass
@@ -31,4 +32,3 @@ class MissingRelationError(DictalchemyError):
 
     def __str__(self):
         return "Relation '%r' is not found" % (self.relation_key,)
-

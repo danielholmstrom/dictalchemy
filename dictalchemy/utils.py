@@ -1,8 +1,8 @@
 # vim: set fileencoding=utf-8 :
 from __future__ import absolute_import, division
 
-from sqlalchemy.orm import RelationshipProperty, ColumnProperty,\
-        SynonymProperty
+from sqlalchemy.orm import (RelationshipProperty, ColumnProperty,
+                            SynonymProperty)
 from sqlalchemy.orm.collections import InstrumentedList, MappedCollection
 
 from dictalchemy import constants
@@ -52,7 +52,7 @@ def get_primary_key_properties(model):
 
 
 def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
-        follow=None, include=None):
+           follow=None, include=None):
     """Get a dict from a model
 
     This method can also be set on a class directly.
@@ -79,7 +79,7 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
     """
 
-    if follow == None:
+    if follow is None:
         follow = []
     try:
         follow = dict(follow)
@@ -88,26 +88,27 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
     exclude = exclude or []
     exclude += getattr(model, 'dictalchemy_exclude',
-            constants.default_exclude) or []
+                       constants.default_exclude) or []
     if exclude_underscore is None:
         exclude_underscore = getattr(model, 'dictalchemy_exclude_underscore',
-                constants.default_exclude_underscore)
+                                     constants.default_exclude_underscore)
     if exclude_underscore:
         # Exclude all properties starting with underscore
-        exclude += [k.key for k in model.__mapper__.iterate_properties\
-                if k.key[0] == '_']
+        exclude += [k.key for k in model.__mapper__.iterate_properties
+                    if k.key[0] == '_']
     if exclude_pk is True:
         exclude += get_primary_key_properties(model)
 
     include = (include or []) + (getattr(model,
-        'dictalchemy_asdict_include', None) or [])
+                                         'dictalchemy_asdict_include',
+                                         None) or [])
 
     columns = get_column_keys(model)
     synonyms = get_synonym_keys(model)
     relations = get_relation_keys(model)
 
-    data = dict([(k, getattr(model, k)) for k in columns + synonyms + include\
-            if k not in exclude])
+    data = dict([(k, getattr(model, k)) for k in columns + synonyms + include
+                 if k not in exclude])
 
     for (k, args) in follow.iteritems():
         if k not in relations:
@@ -138,7 +139,7 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
 
 def fromdict(model, data, exclude=None, exclude_underscore=None,
-        allow_pk=None, follow=None, include=None):
+             allow_pk=None, follow=None, include=None):
     """Update a model from a dict
 
     This method updates the following properties on a model:
@@ -166,7 +167,7 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
 
     """
 
-    if follow == None:
+    if follow is None:
         follow = []
     try:
         follow = dict(follow)
@@ -175,22 +176,23 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
 
     exclude = exclude or []
     exclude += getattr(model, 'dictalchemy_exclude',
-            constants.default_exclude) or []
+                       constants.default_exclude) or []
     if exclude_underscore is None:
         exclude_underscore = getattr(model, 'dictalchemy_exclude_underscore',
-                constants.default_exclude_underscore)
+                                     constants.default_exclude_underscore)
 
     if exclude_underscore:
         # Exclude all properties starting with underscore
-        exclude += [k.key for k in model.__mapper__.iterate_properties\
-                if k.key[0] == '_']
+        exclude += [k.key for k in model.__mapper__.iterate_properties
+                    if k.key[0] == '_']
 
     if allow_pk is None:
         allow_pk = getattr(model, 'dictalchemy_fromdict_allow_pk',
-                constants.default_fromdict_allow_pk)
+                           constants.default_fromdict_allow_pk)
 
     include = (include or []) + (getattr(model,
-        'dictalchemy_fromdict_include', None) or [])
+                                         'dictalchemy_fromdict_include',
+                                         None) or [])
 
     columns = get_column_keys(model)
     synonyms = get_synonym_keys(model)
@@ -200,10 +202,10 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
     # Update simple data
     for k, v in data.iteritems():
         if not allow_pk and k in primary_keys:
-            raise errors.DictalchemyError(\
-                    "Primary key(%r) cannot be updated by fromdict."
-                    "Set 'dictalchemy_fromdict_allow_pk' to True in your Model"
-                    " or pass 'allow_pk=True'." % k)
+            msg = "Primary key(%r) cannot be updated by fromdict."
+            "Set 'dictalchemy_fromdict_allow_pk' to True in your Model"
+            " or pass 'allow_pk=True'." % k
+            raise errors.DictalchemyError(msg)
         if k in columns + synonyms + include:
             setattr(model, k, v)
 
@@ -219,6 +221,7 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
 
     return model
 
+
 def iter(model):
     """iter method for models"""
     for i in model.asdict().iteritems():
@@ -226,9 +229,10 @@ def iter(model):
 
 
 def make_class_dictable(cls, exclude=constants.default_exclude,
-        exclude_underscore=constants.default_exclude_underscore,
-        fromdict_allow_pk=constants.default_fromdict_allow_pk,
-        asdict_include=None, fromdict_include=None):
+                        exclude_underscore=constants.
+                        default_exclude_underscore,
+                        fromdict_allow_pk=constants.default_fromdict_allow_pk,
+                        asdict_include=None, fromdict_include=None):
     """Make a class dictable
 
     Useful for when the Base class is already defined, for example when using
