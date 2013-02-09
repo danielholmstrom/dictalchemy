@@ -16,15 +16,12 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.md')).read()
 
 # Requirements for the package
-install_requires = ['Sphinx==1.1.3',
-        'nose==1.2.1',
-        'coverage==3.5.2',
+install_requires = [
         'SQLAlchemy==0.8.0b2',
         ]
 
-
 # Requirement for running tests
-test_requires = install_requires
+test_requires = install_requires + ['nose==1.2.1']
 
 setup(name='dictalchemy',
     version='0.1a4',
