@@ -14,16 +14,24 @@ dict is not a simple task. This library should not be used on more complex
 models without thorough testing, it should however be fine to use on simple
 models.
 
-~~~~~~~~~~~~~~~~~~~~~
+Usage
+=====
+
+There are two ways to use dictalchemy. Either by using
+:class:`dictalchemy.classes.DictableModel` as base class or by using
+:meth:`dictalchemy.utils.make_class_dictable` on an existing base class.
+
+
 A note about synonyms
-~~~~~~~~~~~~~~~~~~~~~
+=====================
 
 Synonyms wraps a reader and a writer method. These methods can do whatever they
-want to so there is no way to safely updated data with synonyms.
+want to so there is no way to safely updated data with synonyms. So keep in
+mind that using synonyms will make it possible to circumvent for example
+dictalchemy_exclude_pk.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~
 Bugs and missing features
-~~~~~~~~~~~~~~~~~~~~~~~~~
+=========================
 
 This library is developed as a helper-library to another piece of software.
 What works for that software is also implemented and tested in dictalchemy.
@@ -39,5 +47,9 @@ from dictalchemy.utils import make_class_dictable, asdict
 from dictalchemy.errors import (DictalchemyError, UnsupportedRelationError,
                                 MissingRelationError)
 
-__all__ = [DictableModel, make_class_dictable, asdict, DictalchemyError,
-           UnsupportedRelationError, MissingRelationError]
+__all__ = [DictableModel,
+           make_class_dictable,
+           asdict,
+           DictalchemyError,
+           UnsupportedRelationError,
+           MissingRelationError]

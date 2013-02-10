@@ -6,3 +6,5 @@ Dictalchemy package
 .. automodule:: dictalchemy.classes
 
 .. automodule:: dictalchemy.utils
+
+.. automodule:: dictalchemy.errors

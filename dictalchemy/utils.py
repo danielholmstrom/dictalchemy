@@ -1,4 +1,9 @@
 # vim: set fileencoding=utf-8 :
+"""
+~~~~~~~~~
+Utilities
+~~~~~~~~~
+"""
 from __future__ import absolute_import, division
 
 from sqlalchemy.orm import (RelationshipProperty, ColumnProperty,
@@ -55,25 +60,55 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
            follow=None, include=None):
     """Get a dict from a model
 
-    This method can also be set on a class directly.
+    Simple example:
+
+        >>> session.query(User).asdict()
+        {'id': 1, 'username': 'Gerald'}
+
+    Using exclude_pk:
+
+        >>> session.query(User).asdict(exclude_pk=True)
+        {'username': 'Gerald'}
+
+    Using exclude_pk:
+
+        >>> session.query(User).asdict(exclude=['id'])
+        {'username': 'Gerald'}
+
+    Using follow without arguments:
+
+        >>> session.query(User).asdict(follow={'groups':{}})
+        {'username': 'Gerald', groups=[{'id': 1, 'name': 'User'}]}
+
+    Using follow with arguments:
+
+        >>> session.query(User).asdict(follow={'groups':{'exclude': ['id']})
+        {'username': 'Gerald', groups=[{'name': 'User'}]}
+
+    Using include(for example for including synonyms/properties):
+
+        >>> session.query(User).asdict(include=['displayname']
+            {'id': 1, 'username': 'Gerald', 'displayname': 'Gerald'}
+
+    **Note:** This method can also be set on a class directly.
 
     :param follow: List or dict of relationships that should be followed. \
             If the parameter is a dict the value should be a dict of \
             keyword arguments. Currently it follows InstrumentedList,\
             MappedCollection and regular 1:1, 1:m, m:m relationships.
     :param exclude: List of properties that should be excluded, will be \
-            merged with model.dictalchemy_exclude.
+            merged with `model.dictalchemy_exclude`.
     :param exclude_pk: If True any column that refers to the primary key will \
             be excluded.
     :param exclude_underscore: Overides model.exclude_underscore if set
     :param include: List of properties that should be included. Use this to \
             allow python properties to be called. This list will be merged \
-            with model.dictalchemy_asdict_include.
+            with `model.dictalchemy_asdict_include`.
 
-    :raises: :class:`dictalchemy.MissingRelationError` \
-            If follow contains a non-existent relationship.
-    :raises: :class:`dictalchemy.UnsupportedRelationError` If follow contains \
-            an existing relationship that currently isn't supported.
+    :raises: :class:`dictalchemy.errors.MissingRelationError` \
+            if `follow` contains a non-existent relationship.
+    :raises: :class:`dictalchemy.errors.UnsupportedRelationError` If `follow` \
+            contains an existing relationship that currently isn't supported.
 
     :returns: dict
 
@@ -142,6 +177,9 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
              allow_pk=None, follow=None, include=None):
     """Update a model from a dict
 
+    Works almost identically as :meth:`dictalchemy.utils.asdict`. However, it
+    will not create missing instances or update collections.
+
     This method updates the following properties on a model:
 
     * Simple columns
@@ -160,8 +198,8 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
             relations, not on lists.
     :param include: list of properties that should be included.
 
-    :raises: :class:`dictalchemy.DictalchemyError` If a primary key is in \
-            data and allow_pk is False
+    :raises: :class:`dictalchemy.DictalchemyError` If a primary key is \
+            in data and allow_pk is False
 
     :returns: The model
 
