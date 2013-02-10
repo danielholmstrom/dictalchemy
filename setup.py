@@ -36,7 +36,7 @@ setup(name='dictalchemy',
       author_email='holmstrom.daniel@gmail.com',
       platforms='any',
       classifiers=['Development Status :: 4 - Beta',
-                   'License :: OSI Approved :: MIT License'
+                   'License :: OSI Approved :: MIT License',
                    'Environment :: Web Environment',
                    'Intended Audience :: Developers',
                    'Operating System :: OS Independent',
