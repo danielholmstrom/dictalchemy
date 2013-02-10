@@ -21,7 +21,7 @@ install_requires = [
         ]
 
 # Requirement for running tests
-test_requires = install_requires + ['nose==1.2.1']
+test_requires = install_requires
 
 setup(name='dictalchemy',
     version='0.1a4',
