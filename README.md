@@ -12,6 +12,8 @@ No release, no version. This code should not be trusted. In pip there are versio
 
 ## Usage
 
+A more complete documentation can be found on [pip](http://pythonhosted.org/dictalchemy/dictalchemy.html).
+
 ### DictableModel
 
 Mixin dictalchemy.DictableModel in a declarative class or use it as a base class for declarative\_base. Each class can have the following attibutes set:
