@@ -37,17 +37,25 @@ dict. The most basic are:
 * exclude_pk
 * allow_pk
 * follow
+* only
 
 The defaults varies depending on the flag. For example, allow_pk will by
 default be set to True for fromdict and exclude_pk will be set to False in
 asdict.
 
-In general `include` flags will override `exclude` flags.
-
 A class or model can have these attributes set, prefixed with
 *dictalchemy\_*. Some of them can also be overridden depending on if
 :meth:`dictalchemy.utils.asdict` or :meth:`dictalchemy.utils.fromdict` is
 called. If they are set they will override the more basic attribute.
+
+Some semi-rules
+^^^^^^^^^^^^^^^
+
+* In general `include` flags will override `exclude` flags.
+* In general `only` will override `exclude` and `include` flags.
+* In :meth:`dictalchemy.utils.fromdict `allow_pk`=False will override all \
+        other flags.
+
 
 Class/Model attributes
 ^^^^^^^^^^^^^^^^^^^^^^
