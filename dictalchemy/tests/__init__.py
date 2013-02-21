@@ -230,9 +230,7 @@ class WithDefaultInclude(Base):
 
     __tablename__ = 'withdefaultinclude'
 
-    dictalchemy_asdict_include = ['id_alias']
-
-    dictalchemy_fromdict_include = ['id_alias']
+    dictalchemy_include = ['id_alias']
 
     id = Column('id', Integer, primary_key=True)
 
@@ -271,4 +269,4 @@ class WithAttributeMappedCollection(Base):
     childs = relationship(WithAttributeMappedCollectionChild,
             collection_class=attribute_mapped_collection('name'),
             cascade="all, delete-orphan",
-            backref=backref('parents')) 
+            backref=backref('parents'))

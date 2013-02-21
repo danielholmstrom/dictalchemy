@@ -100,10 +100,12 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
             merged with `model.dictalchemy_exclude`.
     :param exclude_pk: If True any column that refers to the primary key will \
             be excluded.
-    :param exclude_underscore: Overides model.exclude_underscore if set
+    :param exclude_underscore: Overides `model.dictalchemy_exclude_underscore`\
+            if set
     :param include: List of properties that should be included. Use this to \
             allow python properties to be called. This list will be merged \
-            with `model.dictalchemy_asdict_include`.
+            with `model.dictalchemy_asdict_include` or \
+            `model.dictalchemy_include`.
 
     :raises: :class:`dictalchemy.errors.MissingRelationError` \
             if `follow` contains a non-existent relationship.
@@ -136,7 +138,8 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
     include = (include or []) + (getattr(model,
                                          'dictalchemy_asdict_include',
-                                         None) or [])
+                                         getattr(model, 'dictalchemy_include',
+                                                 None)) or [])
 
     columns = get_column_keys(model)
     synonyms = get_synonym_keys(model)
@@ -230,7 +233,9 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
 
     include = (include or []) + (getattr(model,
                                          'dictalchemy_fromdict_include',
-                                         None) or [])
+                                         getattr(model,
+                                                 'dictalchemy_include',
+                                                 None)) or [])
 
     columns = get_column_keys(model)
     synonyms = get_synonym_keys(model)
@@ -254,6 +259,7 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
         if k not in relations:
             raise errors.MissingRelationError(k)
         rel = getattr(model, k)
+        # TODO: Check for fromdict, not asdict
         if hasattr(rel, 'asdict'):
             rel.fromdict(data[k], **args)
 
@@ -266,11 +272,14 @@ def iter(model):
         yield i
 
 
-def make_class_dictable(cls, exclude=constants.default_exclude,
-                        exclude_underscore=constants.
-                        default_exclude_underscore,
-                        fromdict_allow_pk=constants.default_fromdict_allow_pk,
-                        asdict_include=None, fromdict_include=None):
+def make_class_dictable(
+        cls,
+        exclude=constants.default_exclude,
+        exclude_underscore=constants.default_exclude_underscore,
+        fromdict_allow_pk=constants.default_fromdict_allow_pk,
+        include=None,
+        asdict_include=None,
+        fromdict_include=None):
     """Make a class dictable
 
     Useful for when the Base class is already defined, for example when using
@@ -283,10 +292,11 @@ def make_class_dictable(cls, exclude=constants.default_exclude,
             on the class
     :param fromdict_allow_pk: Will be set as dictalchemy_fromdict_allow_pk\
             on the class
-    :param asdict_include: Will be set as dictalchemy_asdict_include on the \
-            class
-    :param fromdict_include: Will be set as dictalchemy_fromdict_include on \
-            the class
+    :param include: Will be set as dictalchemy_include on the class.
+    :param asdict_include: Will be set as `dictalchemy_asdict_include` on the \
+            class. If not None it will override `dictalchemy_include`.
+    :param fromdict_include: Will be set as `dictalchemy_fromdict_include` on \
+            the class. If not None it will override `dictalchemy_include`.
 
     :returns: The class
     """
@@ -297,6 +307,7 @@ def make_class_dictable(cls, exclude=constants.default_exclude,
     setattr(cls, 'asdict', asdict)
     setattr(cls, 'fromdict', fromdict)
     setattr(cls, '__iter__', iter)
+    setattr(cls, 'dictalchemy_include', include)
     setattr(cls, 'dictalchemy_asdict_include', asdict_include)
     setattr(cls, 'dictalchemy_fromdict_include', fromdict_include)
     return cls

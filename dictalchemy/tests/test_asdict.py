@@ -144,6 +144,20 @@ class TestAsdict(TestCase):
     def test_default_include(self):
         assert WithDefaultInclude(2).asdict() == {'id': 2, 'id_alias': 2}
 
+    def test_dictalchemy_include(self):
+        m = WithHybrid(2)
+        assert 'id' not in dict(m)
+        setattr(m, 'dictalchemy_include', ['id'])
+        assert 'id' in dict(m)
+
+    def test_dictalchemy_asdict_include_overrides(self):
+        m = WithHybrid(2)
+        assert 'id' not in dict(m)
+        setattr(m, 'dictalchemy_include', ['id'])
+        assert 'id' in dict(m)
+        setattr(m, 'dictalchemy_asdict_include', [])
+        assert 'id' not in dict(m)
+
     def test_attribute_mapped_collection(self):
         p = WithAttributeMappedCollection()
         p.childs['child1'] = WithAttributeMappedCollectionChild('child1')

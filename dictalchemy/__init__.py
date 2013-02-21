@@ -21,6 +21,39 @@ There are two ways to use dictalchemy. Either by using
 :class:`dictalchemy.classes.DictableModel` as base class or by using
 :meth:`dictalchemy.utils.make_class_dictable` on an existing base class.
 
+Attributes and parameters
+-------------------------
+
+Dictalchemy uses some basic attributes and parameters to convert to and from
+dict. The most basic are:
+
+* include
+* exclude
+* exclude_pk
+* allow_pk
+* follow
+
+The defaults varies depending on the flag. For example, allow_pk will by
+default be set to True for fromdict and exclude_pk will be set to False in
+asdict.
+
+In general `exclude` flags will override `include` flags.
+
+A class or model can have these attributes set, prefixed with
+*dictalchemy\_*. Some of them can also be overridden depending on if
+:meth:`dictalchemy.utils.asdict` or :meth:`dictalchemy.utils.fromdict` is
+called. If they are set they will override the more basic attribute.
+
+Class/Model attributes
+^^^^^^^^^^^^^^^^^^^^^^
+
+* dictalchemy_exclude
+* dictalchemy_include
+* dictalchemy_fromdict_include
+* dictalchemy_asdict_include
+* dictalchemy_exclude_underscore
+* dictalchemy_fromdict_allow_pk
+
 
 A note about synonyms
 =====================
