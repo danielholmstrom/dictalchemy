@@ -105,3 +105,19 @@ class TestFromdict(TestCase):
         h.fromdict({'id_alias': 4})
         assert h.id_alias == 4
 
+    def test_only(self):
+        named = Named('a name')
+        named.fromdict({'name': 'other name'}, only=['name'])
+        assert named.name == 'other name'
+        named.fromdict({'name': 'other name'}, only=['id'])
+        assert named.name == 'other name'
+
+    def test_only_overrides_include(self):
+        named = Named('a name')
+        named.fromdict({'name': 'other name'}, include='name', only=['id'])
+        assert named.name == 'a name'
+
+    def test_only_overrides_exclude(self):
+        named = Named('a name')
+        named.fromdict({'name': 'other name'}, exclude='name', only=['name'])
+        assert named.name == 'other name'

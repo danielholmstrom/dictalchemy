@@ -184,7 +184,7 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
 
 def fromdict(model, data, exclude=None, exclude_underscore=None,
-             allow_pk=None, follow=None, include=None):
+             allow_pk=None, follow=None, include=None, only=None):
     """Update a model from a dict
 
     Works almost identically as :meth:`dictalchemy.utils.asdict`. However, it
@@ -210,6 +210,8 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
     :param include: List of properties that should be included. This list \
             will override anything in the exclude list. It will not override \
             allow_pk.
+    :param only: List of the only properties that should be returned. This \
+            will not override `allow_pk` or `follow`.
 
     :raises: :class:`dictalchemy.DictalchemyError` If a primary key is \
             in data and allow_pk is False
@@ -230,32 +232,36 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
     relations = get_relation_keys(model)
     primary_keys = get_primary_key_properties(model)
 
-    exclude = exclude or []
-    exclude += getattr(model, 'dictalchemy_exclude',
-                       constants.default_exclude) or []
-    if exclude_underscore is None:
-        exclude_underscore = getattr(model, 'dictalchemy_exclude_underscore',
-                                     constants.default_exclude_underscore)
+    if only:
+        attrs = only
+    else:
+        exclude = exclude or []
+        exclude += getattr(model, 'dictalchemy_exclude',
+                           constants.default_exclude) or []
+        if exclude_underscore is None:
+            exclude_underscore = getattr(model,
+                                         'dictalchemy_exclude_underscore',
+                                         constants.default_exclude_underscore)
 
-    if exclude_underscore:
-        # Exclude all properties starting with underscore
-        exclude += [k.key for k in model.__mapper__.iterate_properties
-                    if k.key[0] == '_']
+        if exclude_underscore:
+            # Exclude all properties starting with underscore
+            exclude += [k.key for k in model.__mapper__.iterate_properties
+                        if k.key[0] == '_']
 
-    if allow_pk is None:
-        allow_pk = getattr(model, 'dictalchemy_fromdict_allow_pk',
-                           constants.default_fromdict_allow_pk)
+        if allow_pk is None:
+            allow_pk = getattr(model, 'dictalchemy_fromdict_allow_pk',
+                            constants.default_fromdict_allow_pk)
 
-    include = (include or []) + (getattr(model,
-                                         'dictalchemy_fromdict_include',
-                                         getattr(model,
-                                                 'dictalchemy_include',
-                                                 None)) or [])
-    attrs = [k for k in columns + synonyms if k not in exclude] + include
+        include = (include or []) + (getattr(model,
+                                            'dictalchemy_fromdict_include',
+                                            getattr(model,
+                                                    'dictalchemy_include',
+                                                    None)) or [])
+        attrs = [k for k in columns + synonyms if k not in exclude] + include
 
     # Update simple data
     for k, v in data.iteritems():
-        if not allow_pk and k in primary_keys and k:
+        if not allow_pk and k in primary_keys:
             msg = "Primary key(%r) cannot be updated by fromdict."
             "Set 'dictalchemy_fromdict_allow_pk' to True in your Model"
             " or pass 'allow_pk=True'." % k
