@@ -21,6 +21,11 @@ There are two ways to use dictalchemy. Either by using
 :class:`dictalchemy.classes.DictableModel` as base class or by using
 :meth:`dictalchemy.utils.make_class_dictable` on an existing base class.
 
+Since attributes are checked on instances each instance can get their own setup
+of rules. This can be usefull when returning a model instance as a response. If
+default values are set on that specific instance calling `dict` will render it
+properly.
+
 Attributes and parameters
 -------------------------
 

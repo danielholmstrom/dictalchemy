@@ -164,3 +164,24 @@ class TestAsdict(TestCase):
         assert p.asdict(follow=['childs']) == {'childs':\
                 {'child1':\
                 {'parent_id': None, 'id': None, 'name': 'child1'}}, 'id': None}
+
+    def test_only(self):
+        named = Named('a name')
+        assert 'name' in dict(named)
+        assert 'id' in dict(named)
+        assert 'name' not in named.asdict(only=['id'])
+        assert 'id' not in named.asdict(only=['name'])
+
+    def test_only_overrides_include(self):
+        named = Named('a name')
+        assert 'name' in dict(named)
+        assert 'id' in dict(named)
+        assert 'name' not in named.asdict(only=['id'], include=['name'])
+        assert 'id' not in named.asdict(only=['name'], include=['id'])
+
+    def test_only_overrides_exclude(self):
+        named = Named('a name')
+        assert 'name' in dict(named)
+        assert 'id' in dict(named)
+        assert 'name' not in named.asdict(only=['id'], exclude=['id'])
+        assert 'id' not in named.asdict(only=['name'], exclude=['name'])

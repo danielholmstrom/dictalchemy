@@ -57,7 +57,7 @@ def get_primary_key_properties(model):
 
 
 def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
-           follow=None, include=None):
+           follow=None, include=None, only=None):
     """Get a dict from a model
 
     Simple example:
@@ -106,6 +106,8 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
             allow python properties to be called. This list will be merged \
             with `model.dictalchemy_asdict_include` or \
             `model.dictalchemy_include`.
+    :param only: List of properties that should be included. This will \
+            override everything else except `follow`.
 
     :raises: :class:`dictalchemy.errors.MissingRelationError` \
             if `follow` contains a non-existent relationship.
@@ -123,30 +125,35 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
     except ValueError:
         follow = dict.fromkeys(list(follow), {})
 
-    exclude = exclude or []
-    exclude += getattr(model, 'dictalchemy_exclude',
-                       constants.default_exclude) or []
-    if exclude_underscore is None:
-        exclude_underscore = getattr(model, 'dictalchemy_exclude_underscore',
-                                     constants.default_exclude_underscore)
-    if exclude_underscore:
-        # Exclude all properties starting with underscore
-        exclude += [k.key for k in model.__mapper__.iterate_properties
-                    if k.key[0] == '_']
-    if exclude_pk is True:
-        exclude += get_primary_key_properties(model)
-
-    include = (include or []) + (getattr(model,
-                                         'dictalchemy_asdict_include',
-                                         getattr(model, 'dictalchemy_include',
-                                                 None)) or [])
-
     columns = get_column_keys(model)
     synonyms = get_synonym_keys(model)
     relations = get_relation_keys(model)
 
-    data = dict([(k, getattr(model, k)) for k in columns + synonyms + include
-                 if k not in exclude])
+    if only:
+        attrs = only
+    else:
+        exclude = exclude or []
+        exclude += getattr(model, 'dictalchemy_exclude',
+                        constants.default_exclude) or []
+        if exclude_underscore is None:
+            exclude_underscore = getattr(model,
+                                         'dictalchemy_exclude_underscore',
+                                         constants.default_exclude_underscore)
+        if exclude_underscore:
+            # Exclude all properties starting with underscore
+            exclude += [k.key for k in model.__mapper__.iterate_properties
+                        if k.key[0] == '_']
+        if exclude_pk is True:
+            exclude += get_primary_key_properties(model)
+
+        include = (include or []) + (getattr(model,
+                                             'dictalchemy_asdict_include',
+                                             getattr(model,
+                                                     'dictalchemy_include',
+                                                     None)) or [])
+        attrs = [k for k in columns + synonyms + include if k not in exclude]
+
+    data = dict([(k, getattr(model, k)) for k in attrs])
 
     for (k, args) in follow.iteritems():
         if k not in relations:
