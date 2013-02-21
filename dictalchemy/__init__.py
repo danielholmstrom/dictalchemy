@@ -42,7 +42,7 @@ The defaults varies depending on the flag. For example, allow_pk will by
 default be set to True for fromdict and exclude_pk will be set to False in
 asdict.
 
-In general `exclude` flags will override `include` flags.
+In general `include` flags will override `exclude` flags.
 
 A class or model can have these attributes set, prefixed with
 *dictalchemy\_*. Some of them can also be overridden depending on if

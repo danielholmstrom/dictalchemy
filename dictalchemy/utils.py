@@ -202,11 +202,14 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
             if set to None model.dictalchemy_exclude_underscore will be used.
     :param allow_pk: If True any column that refers to the primary key will \
             be excluded. Defaults model.dictalchemy_fromdict_allow_pk or \
-            dictable.constants.fromdict_allow_pk
+            dictable.constants.fromdict_allow_pk. If set to True a primary \
+            key can still be excluded with the `exclude` parameter.
     :param follow: Dict of relations that should be followed, the key is the \
             arguments passed to the relation. Relations only works on simple \
             relations, not on lists.
-    :param include: list of properties that should be included.
+    :param include: List of properties that should be included. This list \
+            will override anything in the exclude list. It will not override \
+            allow_pk.
 
     :raises: :class:`dictalchemy.DictalchemyError` If a primary key is \
             in data and allow_pk is False
@@ -221,6 +224,11 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
         follow = dict(follow)
     except ValueError:
         follow = dict.fromkeys(list(follow), {})
+
+    columns = get_column_keys(model)
+    synonyms = get_synonym_keys(model)
+    relations = get_relation_keys(model)
+    primary_keys = get_primary_key_properties(model)
 
     exclude = exclude or []
     exclude += getattr(model, 'dictalchemy_exclude',
@@ -243,20 +251,16 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
                                          getattr(model,
                                                  'dictalchemy_include',
                                                  None)) or [])
-
-    columns = get_column_keys(model)
-    synonyms = get_synonym_keys(model)
-    relations = get_relation_keys(model)
-    primary_keys = get_primary_key_properties(model)
+    attrs = [k for k in columns + synonyms if k not in exclude] + include
 
     # Update simple data
     for k, v in data.iteritems():
-        if not allow_pk and k in primary_keys:
+        if not allow_pk and k in primary_keys and k:
             msg = "Primary key(%r) cannot be updated by fromdict."
             "Set 'dictalchemy_fromdict_allow_pk' to True in your Model"
             " or pass 'allow_pk=True'." % k
             raise errors.DictalchemyError(msg)
-        if k in columns + synonyms + include:
+        if k in attrs:
             setattr(model, k, v)
 
     # Update simple relations

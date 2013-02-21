@@ -72,6 +72,11 @@ class TestFromdict(TestCase):
 
         assert result == expected, "%r == %r" % (result, expected)
 
+    def test_exclude(self):
+        h = Named('a name')
+        h.fromdict({'name': 'other name'}, exclude=['name'])
+        assert h.name == 'a name'
+
     def test_include(self):
         h = WithHybrid(1)
         h.fromdict({'id': 17}, include=['id'])
