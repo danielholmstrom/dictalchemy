@@ -3,12 +3,15 @@ from __future__ import absolute_import, division
 
 # vim: set fileencoding=utf-8 :
 from __future__ import absolute_import, division
-from dictalchemy.tests import TestCase, Named, NamedWithOtherPk,\
-        NamedOtherColumnName,\
-        NamedWithSynonym, OneToManyChild, OneToManyParent,\
-        M2mLeft, M2mRight,\
-        MultipleChildParent, MultipleChildChild1, MultipleChildChild2,\
-        MultipleChildChild1Child, WithHybrid, WithDefaultInclude
+from dictalchemy.tests import (
+    TestCase,
+    Named,
+    NamedWithOtherPk,
+    OneToManyChild,
+    OneToManyParent,
+    WithHybrid,
+    WithDefaultInclude
+)
 
 
 class TestFromdict(TestCase):
@@ -64,11 +67,13 @@ class TestFromdict(TestCase):
         self.session.add(parent)
         self.session.commit()
 
-        parent.fromdict({'name': 'Parent new name',\
-                'child': {'name': 'Child new name'}}, follow=['child'])
+        parent.fromdict({'name': 'Parent new name',
+                         'child': {'name': 'Child new name'}},
+                        follow=['child'])
         result = parent.asdict(follow=['child'])
-        expected = {'id': parent.id, 'name': 'Parent new name',\
-                'child': {'id': child.id, 'name': 'Child new name'}}
+        expected = {'id': parent.id,
+                    'name': 'Parent new name',
+                    'child': {'id': child.id, 'name': 'Child new name'}}
 
         assert result == expected, "%r == %r" % (result, expected)
 

@@ -99,22 +99,22 @@ class OneToManyParent(Base):
     _child_id = Column(Integer, ForeignKey(OneToManyChild.id))
 
     child = relationship(OneToManyChild,
-        primaryjoin=_child_id == OneToManyChild.id,
-            backref=backref('parent'))
+                         primaryjoin=_child_id == OneToManyChild.id,
+                         backref=backref('parent'))
 
     def __init__(self, name):
         self.name = name
 
 
 m2m_table = Table('m2m_table',
-        Base.metadata,
-        Column('left_id', Integer,
-            ForeignKey('m2mleft.id'),
-            primary_key=True),
-        Column('right_id', Integer,
-            ForeignKey('m2mright.id'),
-            primary_key=True),
-        )
+                  Base.metadata,
+                  Column('left_id', Integer,
+                         ForeignKey('m2mleft.id'),
+                         primary_key=True),
+                  Column('right_id', Integer,
+                         ForeignKey('m2mright.id'),
+                         primary_key=True),
+                  )
 
 
 class M2mLeft(Base):
@@ -127,8 +127,9 @@ class M2mLeft(Base):
     def __init__(self, name):
         self.name = name
 
-    rights = relationship('M2mRight', secondary=m2m_table,
-            backref=backref('lefts'))
+    rights = relationship('M2mRight',
+                          secondary=m2m_table,
+                          backref=backref('lefts'))
 
 
 class M2mRight(Base):
@@ -165,8 +166,8 @@ class MultipleChildChild1(Base):
     _child_id = Column(Integer, ForeignKey(MultipleChildChild1Child.id))
 
     child = relationship(MultipleChildChild1Child,
-        primaryjoin=_child_id == MultipleChildChild1Child.id,
-            backref=backref('parent'))
+                         primaryjoin=_child_id == MultipleChildChild1Child.id,
+                         backref=backref('parent'))
 
     def __init__(self, name):
         self.name = name
@@ -197,12 +198,12 @@ class MultipleChildParent(Base):
     _child2_id = Column(Integer, ForeignKey(MultipleChildChild2.id))
 
     child1 = relationship(MultipleChildChild1,
-        primaryjoin=_child1_id == MultipleChildChild1.id,
-            backref=backref('parent'))
+                          primaryjoin=_child1_id == MultipleChildChild1.id,
+                          backref=backref('parent'))
 
     child2 = relationship(MultipleChildChild2,
-        primaryjoin=_child2_id == MultipleChildChild2.id,
-            backref=backref('parent'))
+                          primaryjoin=_child2_id == MultipleChildChild2.id,
+                          backref=backref('parent'))
 
     def __init__(self, name):
         self.name = name
@@ -240,7 +241,7 @@ class WithDefaultInclude(Base):
 
     @id_alias.setter
     def set_id_alias(self, value):
-        self.id = value;
+        self.id = value
 
     def __init__(self, id):
         self.id = id
@@ -267,6 +268,6 @@ class WithAttributeMappedCollection(Base):
     id = Column(Integer, primary_key=True)
 
     childs = relationship(WithAttributeMappedCollectionChild,
-            collection_class=attribute_mapped_collection('name'),
-            cascade="all, delete-orphan",
-            backref=backref('parents'))
+                          collection_class=attribute_mapped_collection('name'),
+                          cascade="all, delete-orphan",
+                          backref=backref('parents'))

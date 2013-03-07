@@ -1,11 +1,23 @@
 # vim: set fileencoding=utf-8 :
 from __future__ import absolute_import, division
-from dictalchemy.tests import TestCase, Named, NamedOtherColumnName,\
-        NamedWithSynonym, OneToManyChild, OneToManyParent,\
-        M2mLeft, M2mRight,\
-        MultipleChildParent, MultipleChildChild1, MultipleChildChild2,\
-        MultipleChildChild1Child, WithHybrid, WithDefaultInclude,\
-        WithAttributeMappedCollection, WithAttributeMappedCollectionChild
+from dictalchemy.tests import (
+    TestCase,
+    Named,
+    NamedOtherColumnName,
+    NamedWithSynonym,
+    OneToManyChild,
+    OneToManyParent,
+    M2mLeft,
+    M2mRight,
+    MultipleChildParent,
+    MultipleChildChild1,
+    MultipleChildChild2,
+    MultipleChildChild1Child,
+    WithHybrid,
+    WithDefaultInclude,
+    WithAttributeMappedCollection,
+    WithAttributeMappedCollectionChild
+)
 
 
 class TestAsdict(TestCase):
@@ -76,9 +88,9 @@ class TestAsdict(TestCase):
         parent.child = child
         self.session.add(parent)
         self.session.commit()
-        assert parent.asdict(follow=['child']) ==\
-                {'id': parent.id, 'name': parent.name,
-                        'child': child.asdict()}
+        assert parent.asdict(follow=['child']) == {'id': parent.id,
+                                                   'name': parent.name,
+                                                   'child': child.asdict()}
 
     def test_many_to_many_follow(self):
         s = self.session
@@ -89,10 +101,13 @@ class TestAsdict(TestCase):
         l1.rights.append(r2)
         s.add(l1)
         s.commit()
-        assert l1.asdict(follow=['rights']) == {'id': l1.id, 'name': l1.name,
-                'rights': [r1.asdict(), r2.asdict()]}
-        assert r1.asdict(follow=['lefts']) == {'id': r1.id, 'name': r1.name,
-                'lefts': [l1.asdict()]}
+        assert l1.asdict(follow=['rights']) == {'id': l1.id,
+                                                'name': l1.name,
+                                                'rights': [r1.asdict(),
+                                                           r2.asdict()]}
+        assert r1.asdict(follow=['lefts']) == {'id': r1.id,
+                                               'name': r1.name,
+                                               'lefts': [l1.asdict()]}
 
     def test_one_to_many_follow_with_arguments(self):
         s = self.session
@@ -103,40 +118,52 @@ class TestAsdict(TestCase):
         l1.rights.append(r2)
         s.add(l1)
         s.commit()
-        assert l1.asdict(follow={'rights': {'exclude': ['id']}}) ==\
-                {'id': l1.id, 'name': l1.name,
-                    'rights': [{'name': r1.name}, {'name': r2.name}]}
-        assert r1.asdict(follow={'lefts': {'exclude': ['id']}}) ==\
-                {'id': r1.id, 'name': r1.name,
-                    'lefts': [{'name': l1.name}]}
+        assert l1.asdict(follow={'rights': {'exclude': ['id']}}
+                         ) == {'id': l1.id,
+                               'name': l1.name,
+                               'rights': [{'name': r1.name},
+                                          {'name': r2.name}]}
+        assert r1.asdict(follow={'lefts': {'exclude': ['id']}}
+                         ) == {'id': r1.id,
+                               'name': r1.name,
+                               'lefts': [{'name': l1.name}]}
 
     def test_multiple_child_follow_only_one(self):
         p, c1, c2 = self._setup_multiple_child()
-        assert p.asdict(follow=['child1']) == {'id': p.id, 'name': p.name,
-                'child1': {'id': c1.id, 'name': c1.name}}
+        assert p.asdict(follow=['child1']) == {'id': p.id,
+                                               'name': p.name,
+                                               'child1': {'id': c1.id,
+                                                          'name': c1.name}}
 
     def test_multiple_child_follow_two_with_different_arguments(self):
         p, c1, c2 = self._setup_multiple_child()
         assert p.asdict(follow={'child1': {},
-            'child2': {'exclude': ['id']}}) ==\
-                    {'id': p.id, 'name': p.name,
-                'child1': {'id': c1.id, 'name': c1.name},
-                'child2': {'name': c2.name}}
+                                'child2': {'exclude': ['id']}}
+                        ) == {'id': p.id,
+                              'name': p.name,
+                              'child1': {'id': c1.id,
+                                         'name': c1.name},
+                              'child2': {'name': c2.name}}
 
     def test_multiple_child_follow_two_levels(self):
         p, c1, c2, c1c = self._setup_multiple_child_child()
-        assert p.asdict(follow={'child1': {'follow': ['child']}}) ==\
-                    {'id': p.id, 'name': p.name,
-                'child1': {'id': c1.id, 'name': c1.name,
-                    'child': {'id': c1c.id, 'name': c1c.name}}}
+        assert p.asdict(follow={'child1': {'follow': ['child']}}
+                        ) == {'id': p.id,
+                              'name': p.name,
+                              'child1': {'id': c1.id,
+                                         'name': c1.name,
+                                         'child': {'id': c1c.id,
+                                                   'name': c1c.name}}}
 
     def test_multiple_child_follow_two_levels_with_arguments(self):
         p, c1, c2, c1c = self._setup_multiple_child_child()
-        assert p.asdict(follow={'child1': {'follow':\
-                {'child': {'exclude': ['id']}}}}) ==\
-                    {'id': p.id, 'name': p.name,
-                'child1': {'id': c1.id, 'name': c1.name,
-                    'child': {'name': c1c.name}}}
+        assert p.asdict(follow={'child1': {'follow':
+                                           {'child': {'exclude': ['id']}}}}
+                        ) == {'id': p.id,
+                              'name': p.name,
+                              'child1': {'id': c1.id,
+                                         'name': c1.name,
+                                         'child': {'name': c1c.name}}}
 
     def test_hybrid_property(self):
         assert WithHybrid(2).asdict(include=['id']) == {'id': 2}
@@ -161,9 +188,12 @@ class TestAsdict(TestCase):
     def test_attribute_mapped_collection(self):
         p = WithAttributeMappedCollection()
         p.childs['child1'] = WithAttributeMappedCollectionChild('child1')
-        assert p.asdict(follow=['childs']) == {'childs':\
-                {'child1':\
-                {'parent_id': None, 'id': None, 'name': 'child1'}}, 'id': None}
+        assert p.asdict(follow=['childs']) == {'childs':
+                                               {'child1':
+                                                {'parent_id': None,
+                                                 'id': None,
+                                                 'name': 'child1'}},
+                                               'id': None}
 
     def test_only(self):
         named = Named('a name')

@@ -132,7 +132,7 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
     else:
         exclude = exclude or []
         exclude += getattr(model, 'dictalchemy_exclude',
-                        constants.default_exclude) or []
+                           constants.default_exclude) or []
         if exclude_underscore is None:
             exclude_underscore = getattr(model,
                                          'dictalchemy_exclude_underscore',
@@ -248,13 +248,13 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
 
         if allow_pk is None:
             allow_pk = getattr(model, 'dictalchemy_fromdict_allow_pk',
-                            constants.default_fromdict_allow_pk)
+                               constants.default_fromdict_allow_pk)
 
         include = (include or []) + (getattr(model,
-                                            'dictalchemy_fromdict_include',
-                                            getattr(model,
-                                                    'dictalchemy_include',
-                                                    None)) or [])
+                                             'dictalchemy_fromdict_include',
+                                             getattr(model,
+                                                     'dictalchemy_include',
+                                                     None)) or [])
         attrs = [k for k in columns + synonyms if k not in exclude] + include
 
     # Update simple data
