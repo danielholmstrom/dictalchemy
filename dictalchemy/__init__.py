@@ -1,15 +1,15 @@
 # vim: set fileencoding=utf-8 :
 """
 
-~~~~~~~~~~~~
+************
 Introduction
-~~~~~~~~~~~~
+************
 
 This library adds basic functionality for getting a dict from an SQLAlchemy
 model and updating a model from a dict.
 
 SQLAlchemy is a very complex library. It contains synonyms, lists, sets, mixins
-and god knows what. Automatically convert that to a dict resp. update from a
+and god knows what. Automatically convert that to a dict or update from a
 dict is not a simple task. This library should not be used on more complex
 models without thorough testing, it should however be fine to use on simple
 models.
@@ -21,10 +21,38 @@ There are two ways to use dictalchemy. Either by using
 :class:`dictalchemy.classes.DictableModel` as base class or by using
 :meth:`dictalchemy.utils.make_class_dictable` on an existing base class.
 
+The actual work is done in the functions :func:`dictalchemy.utils.asdict` and
+:func:`dictalchemy.utils.fromdict`.
+
 Since attributes are checked on instances each instance can get their own setup
-of rules. This can be usefull when returning a model instance as a response. If
+of rules. This can be useful when returning a model instance as a response. If
 default values are set on that specific instance calling `dict` will render it
 properly.
+
+Using DictableModel
+-----------------------------------------
+
+Use :class:`dictalchemy.classes.DictableModel` as a base class for
+:class:`sqlalchemy.ext.declarative_base`.
+
+Example::
+
+    from sqlalchemy.ext import declarative_base
+    from dictalchemy import DictableModel
+    Base = declarative_base(cls=DictableModel)
+
+Using make_class_dictable
+-------------------------
+
+:func:`dictalchemy.utils.make_class_dictable` adds methods and attributes to an
+already existing class
+
+Example::
+
+    from sqlalchemy.ext import declarative_base
+    from dictalchemy import make_class_dictable
+    base = declarative_base()
+    make_class_dictable(base)
 
 Attributes and parameters
 -------------------------
@@ -53,7 +81,7 @@ Some semi-rules
 
 * In general `include` flags will override `exclude` flags.
 * In general `only` will override `exclude` and `include` flags.
-* In :meth:`dictalchemy.utils.fromdict `allow_pk`=False will override all \
+* In :meth:`dictalchemy.utils.fromdict` `allow_pk`=False will override all \
         other flags.
 
 

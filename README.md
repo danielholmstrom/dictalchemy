@@ -1,10 +1,10 @@
 # Add asdict() and fromdict() methods to SQLAlchemy declarative models
 
-dictutils add the helpers asdict() and fromdict() to SQLAlchemy declarative models. Currently documentations is lacking and the API is under development.
+dictutils add the helper methods asdict() and fromdict() to SQLAlchemy declarative models.
 
 Currently this works with synonyms and simple relations-ships as one-to-many and many-to-many. Relationships can be followed in many levels.
 
-The only collection currently supported is sqlalchemy.orm.collections.InstrumentedList.
+The only collections currently supported is sqlalchemy.orm.collections.InstrumentedList and sqlalchemy.orm.collections.MappedCollection.
 
 ## Status
 
@@ -20,8 +20,9 @@ Mixin dictalchemy.DictableModel in a declarative class or use it as a base class
 
 * dictalchemy\_exclude: List of properties that should be excluded by default(default empty)
 * dictalchemy\_exclude\_underscore: Exclude properties starting with an underscore(default True)
-* dictalchemy\_include: List of properties that should be included by default(default empty)
-* dictalchemy\_fromdict\_allow\_pk: If True the primary key may be updated with fromdict()
+* dictalchemy\_fromdict\_allow\_pk: If True the primary key may be updated with *fromdict()*
+* dictalchemy\_asdict\_include: List of properties that always should be included when calling *DictableModel.asdict*
+* dictalchemy\_fromdict\_include: List of properties that always should be included when calling *DictableModel.fromdict*
 
 ## make\_class\_dictable()
 
