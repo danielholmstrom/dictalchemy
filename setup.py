@@ -19,14 +19,14 @@ README = open(os.path.join(here, 'README.rst')).read()
 
 # Requirements for the package
 install_requires = [
-    'SQLAlchemy==0.8.0b2',
+    'SQLAlchemy==0.8.0',
 ]
 
 # Requirement for running tests
 test_requires = install_requires
 
 setup(name='dictalchemy',
-      version='0.1b2',
+      version='0.1',
       description="Contains asdict and fromdict methods for SQL-Alchemy "
       "declarative models",
       long_description=__doc__,
@@ -35,7 +35,7 @@ setup(name='dictalchemy',
       author='Daniel Holmstrom',
       author_email='holmstrom.daniel@gmail.com',
       platforms='any',
-      classifiers=['Development Status :: 4 - Beta',
+      classifiers=['Development Status :: 5 - Production/Stable',
                    'License :: OSI Approved :: MIT License',
                    'Environment :: Web Environment',
                    'Intended Audience :: Developers',
