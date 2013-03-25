@@ -29,7 +29,7 @@ setup(name='dictalchemy',
       version='0.1',
       description="Contains asdict and fromdict methods for SQL-Alchemy "
       "declarative models",
-      long_description=__doc__,
+      long_description=README,
       url='http://github.com/danielholmstrom/dictalchemy/',
       license='MIT',
       author='Daniel Holmstrom',
