@@ -37,10 +37,7 @@ source_suffix = '.rst'
 source_encoding = 'utf-8-sig'
 
 # Generate documentation for much
-autodoc_default_flags = ['members',
-'private-members',
-'inherited-members',
-'show-inheritance']
+autodoc_default_flags = ['members', 'show-inheritance']
 
 # The master toctree document.
 master_doc = 'index'

@@ -60,42 +60,12 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
            follow=None, include=None, only=None):
     """Get a dict from a model
 
-    Simple example::
-
-        session.query(User).asdict()
-        {'id': 1, 'username': 'Gerald'}
-
-    Using exclude_pk::
-
-        session.query(User).asdict(exclude_pk=True)
-        {'username': 'Gerald'}
-
-    Using exclude::
-
-        session.query(User).asdict(exclude=['id'])
-        {'username': 'Gerald'}
-
-    Using follow without arguments::
-
-        session.query(User).asdict(follow={'groups':{}})
-        {'username': 'Gerald', groups=[{'id': 1, 'name': 'User'}]}
-
-    Using follow with arguments::
-
-        session.query(User).asdict(follow={'groups':{'exclude': ['id']})
-        {'username': 'Gerald', groups=[{'name': 'User'}]}
-
-    Using include(for example for including synonyms/properties)::
-
-        session.query(User).asdict(include=['displayname']
-        {'id': 1, 'username': 'Gerald', 'displayname': 'Gerald'}
-
     :param follow: List or dict of relationships that should be followed. \
             If the parameter is a dict the value should be a dict of \
             keyword arguments. Currently it follows InstrumentedList,\
             MappedCollection and regular 1:1, 1:m, m:m relationships.
     :param exclude: List of properties that should be excluded, will be \
-            merged with `model.classes.DictableModel.dictalchemy_exclude`
+            merged with `model.dictalchemy_exclude`
     :param exclude_pk: If True any column that refers to the primary key will \
             be excluded.
     :param exclude_underscore: Overides `model.dictalchemy_exclude_underscore`\
@@ -211,7 +181,7 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
     :param only: List of the only properties that should be returned. This \
             will not override `allow_pk` or `follow`.
 
-    :raises: :class:`dictalchemy.DictalchemyError` If a primary key is \
+    :raises: :class:`dictalchemy.errors.DictalchemyError` If a primary key is \
             in data and allow_pk is False
 
     :returns: The model
@@ -282,7 +252,10 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
 
 
 def iter(model):
-    """iter method for models"""
+    """iter method for models
+
+    Yields everything returned by `asdict`.
+    """
     for i in model.asdict().iteritems():
         yield i
 

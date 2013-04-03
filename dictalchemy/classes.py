@@ -20,13 +20,6 @@ class DictableModel(object):
     Contains the methods :meth:`DictableModel.__iter__`,
     :meth:`DictableModel.asdict` and :meth:`DictableModel.fromdict`.
 
-    Example usage:
-
-        >>> from dictalchemy import DictableModel
-        >>> from slqlachemy.ext.declarative import declarative_base
-        >>> Base = declarative_base(cls=DictableModel)
-
-
     :ivar dictalchemy_exclude: List of properties that should always be \
             excluded.
     :ivar dictalchemy_exclude_underscore: If True properties starting with an \
