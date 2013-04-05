@@ -11,8 +11,8 @@ Read more in the source or on github
 """
 
 import os
-from setuptools import find_packages
-from distutils.core import setup
+import sys
+from setuptools import find_packages, setup
 
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
@@ -25,6 +25,10 @@ install_requires = [
 # Requirement for running tests
 test_requires = install_requires
 
+extra = {}
+if sys.version_info >= (3,):
+    extra['use_2to3'] = True
+
 setup(name='dictalchemy',
       version='0.1.1',
       description="Contains asdict and fromdict methods for SQL-Alchemy "
@@ -35,7 +39,7 @@ setup(name='dictalchemy',
       author='Daniel Holmstrom',
       author_email='holmstrom.daniel@gmail.com',
       platforms='any',
-      classifiers=['Development Status :: 5 - Production/Stable',
+      classifiers=['Development Status :: 4 - Beta',
                    'License :: OSI Approved :: MIT License',
                    'Environment :: Web Environment',
                    'Intended Audience :: Developers',
@@ -50,4 +54,5 @@ setup(name='dictalchemy',
       install_requires=install_requires,
       tests_require=test_requires,
       test_suite='dictalchemy',
+      **extra
       )
