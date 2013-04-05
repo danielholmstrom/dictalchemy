@@ -136,6 +136,11 @@ API
 
 .. automodule:: dictalchemy.constants
 
+Python versions
+---------------
+
+Dictalchemy supports python 2.7.3 and python 3.3 through `2to3`. Other versions are not tested.
+
 Source
 ------
 
