@@ -9,6 +9,8 @@ from __future__ import absolute_import, division
 from sqlalchemy.orm import (RelationshipProperty, ColumnProperty,
                             SynonymProperty)
 from sqlalchemy.orm.collections import InstrumentedList, MappedCollection
+from sqlalchemy.orm.dynamic import AppenderMixin
+from sqlalchemy.orm.query import Query
 
 from dictalchemy import constants
 from dictalchemy import errors
@@ -144,6 +146,14 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
                     children[child_key] = child.asdict(**args)
                 else:
                     children[child_key] = child.dict(child)
+            data.update({k: children})
+        elif isinstance(rel, (AppenderMixin, Query)):
+            children = []
+            for child in rel.all():
+                if hasattr(child, 'asdict'):
+                    children.append(child.asdict(**args))
+                else:
+                    children.append(dict(child))
             data.update({k: children})
         else:
             raise errors.UnsupportedRelationError(k)
