@@ -16,7 +16,9 @@ from dictalchemy.tests import (
     WithHybrid,
     WithDefaultInclude,
     WithAttributeMappedCollection,
-    WithAttributeMappedCollectionChild
+    WithAttributeMappedCollectionChild,
+    DynamicRelationChild,
+    DynamicRelationParent,
 )
 
 
@@ -215,3 +217,19 @@ class TestAsdict(TestCase):
         assert 'id' in dict(named)
         assert 'name' not in named.asdict(only=['id'], exclude=['id'])
         assert 'id' not in named.asdict(only=['name'], exclude=['name'])
+
+    def test_dynamic_relation(self):
+
+        child = DynamicRelationChild()
+        parent = DynamicRelationParent()
+        parent.childs.append(child)
+        self.session.add(parent)
+        self.session.add(child)
+        self.session.commit()
+        child_id = child.id
+        parent_id = parent.id
+        self.session.expire_all()
+        parent = self.session.query(DynamicRelationParent
+                                    ).filter_by(id=parent_id).first()
+        assert parent.asdict(follow={'childs':{}}
+                             )['childs'][0]['id'] == child_id

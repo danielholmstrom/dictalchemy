@@ -271,3 +271,27 @@ class WithAttributeMappedCollection(Base):
                           collection_class=attribute_mapped_collection('name'),
                           cascade="all, delete-orphan",
                           backref=backref('parents'))
+
+
+class DynamicRelationChild(Base):
+
+    __tablename__ = 'dynamicrelationchild'
+
+    id = Column(Integer, primary_key=True)
+
+    parent_id = Column(Integer, ForeignKey('dynamicrelationparent.id'),
+                       nullable=False)
+
+
+class DynamicRelationParent(Base):
+
+    __tablename__ = 'dynamicrelationparent'
+
+    id = Column(Integer, primary_key=True)
+
+    childs = relationship(
+        DynamicRelationChild,
+        primaryjoin="DynamicRelationChild.parent_id==DynamicRelationParent.id",
+        backref=backref('parent'),
+        lazy='dynamic')
+
