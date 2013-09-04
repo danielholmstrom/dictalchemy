@@ -155,6 +155,8 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
                 else:
                     children.append(dict(child))
             data.update({k: children})
+        elif rel is None:
+            data.update({k: None})
         else:
             raise errors.UnsupportedRelationError(k)
 
