@@ -295,3 +295,14 @@ class DynamicRelationParent(Base):
         backref=backref('parent'),
         lazy='dynamic')
 
+
+class OptionalChild(Base):
+    __tablename__ = 'optionalchild'
+    id = Column(Integer, primary_key=True)
+
+
+class ParentWithOptionalChild(Base):
+    __tablename__ = 'parentwithoptionalchild'
+    id = Column(Integer, primary_key=True)
+    child_id = Column(Integer, ForeignKey('optionalchild.id'), nullable=True)
+    child = relationship(OptionalChild, uselist=False)

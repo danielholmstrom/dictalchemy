@@ -19,6 +19,8 @@ from dictalchemy.tests import (
     WithAttributeMappedCollectionChild,
     DynamicRelationChild,
     DynamicRelationParent,
+    ParentWithOptionalChild,
+    OptionalChild,
 )
 
 
@@ -233,3 +235,14 @@ class TestAsdict(TestCase):
                                     ).filter_by(id=parent_id).first()
         assert parent.asdict(follow={'childs':{}}
                              )['childs'][0]['id'] == child_id
+
+    def test_nullable_fk_returns_none_relation(self):
+        parent = ParentWithOptionalChild()
+        self.session.add(parent)
+        self.session.commit()
+        assert parent.asdict(follow={'child':{}})['child'] == None
+        child = OptionalChild()
+        parent.child = child
+        self.session.add(child)
+        self.session.commit()
+        assert parent.asdict(follow={'child':{}})['child']['id'] == child.id
