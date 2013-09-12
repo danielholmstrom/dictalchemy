@@ -256,8 +256,7 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
         if k not in relations:
             raise errors.MissingRelationError(k)
         rel = getattr(model, k)
-        # TODO: Check for fromdict, not asdict
-        if hasattr(rel, 'asdict'):
+        if hasattr(rel, 'fromdict'):
             rel.fromdict(data[k], **args)
 
     return model
