@@ -54,3 +54,16 @@ class TestMakeDictable(tests.TestCase):
         self.session.add(named)
         self.session.commit()
         assert dict(named) == {'id': named.id, 'name': 'a name'}
+
+
+def test_arg_to_dict():
+
+    from dictalchemy.utils import arg_to_dict
+
+    assert arg_to_dict(None) == {}
+    assert arg_to_dict([]) == {}
+    assert arg_to_dict(['a', 'b']) == {'a': {}, 'b': {}}
+    assert arg_to_dict({
+        'a': {'is_a': True},
+        'b': {'is_b': True},
+    }) == {'a': {'is_a': True}, 'b': {'is_b': True}}

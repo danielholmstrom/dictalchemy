@@ -58,14 +58,73 @@ def get_primary_key_properties(model):
     return primary_keys
 
 
+def arg_to_dict(arg):
+    """Convert an argument that can be None, list/tuple or dict to dict
+
+    Example::
+
+        >>> arg_to_dict(None)
+        []
+        >>> arg_to_dict(['a', 'b'])
+        {'a':{},'b':{}}
+        >>> arg_to_dict({'a':{'only': 'id'}, 'b':{'only': 'id'}})
+        {'a':{'only':'id'},'b':{'only':'id'}}
+
+    :return: dict with keys and dict arguments as value
+    """
+    if arg is None:
+        arg = []
+    try:
+        arg = dict(arg)
+    except ValueError:
+        arg = dict.fromkeys(list(arg), {})
+
+    return arg
+
+
 def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
-           follow=None, include=None, only=None):
+           follow=None, include=None, only=None, method='asdict', **kwargs):
     """Get a dict from a model
+
+
+    Using the method parameter makes it possible to have multiple methods that
+    formats the result.
+
+    Example HAL implementation::
+
+        from dictalchemy.utils import arg_to_dict
+
+        class HalMixin(object):
+
+            base_url = None
+
+            def get_hal_links(self):
+                if self.base_url:
+                    return {'self': '{0}/{1}'.format(self.base_url, self.id)}
+                else:
+                    return {}
+
+            def ashal(self, **kwargs):
+                kwargs['method'] = 'ashal'
+                result = self.asdict(**kwargs)
+
+                follow = arg_to_dict(kwargs.get('follow', None))
+                _embedded = {}
+                for (k, args) in follow.iteritems():
+                    if args.get('_embedded', None) and k in result:
+                        _embedded[k] = result.pop(k)
+
+                result['_embedded'] = _embedded
+                result['_links'] = self.get_hal_links()
+
+                return result
 
     :param follow: List or dict of relationships that should be followed. \
             If the parameter is a dict the value should be a dict of \
             keyword arguments. Currently it follows InstrumentedList,\
-            MappedCollection and regular 1:1, 1:m, m:m relationships.
+            MappedCollection and regular 1:1, 1:m, m:m relationships. Follow \
+            takes an extra argument, 'method', which is the method that \
+            should be used on the relation.
     :param exclude: List of properties that should be excluded, will be \
             merged with `model.dictalchemy_exclude`
     :param exclude_pk: If True any column that refers to the primary key will \
@@ -78,6 +137,9 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
             `model.dictalchemy_include`.
     :param only: List of properties that should be included. This will \
             override everything else except `follow`.
+    :param method: Name of the method that is currently called. This will be \
+            the default method used in 'follow' unless another method is\
+            set.
 
     :raises: :class:`dictalchemy.errors.MissingRelationError` \
             if `follow` contains a non-existent relationship.
@@ -88,12 +150,7 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
     """
 
-    if follow is None:
-        follow = []
-    try:
-        follow = dict(follow)
-    except ValueError:
-        follow = dict.fromkeys(list(follow), {})
+    follow = arg_to_dict(follow)
 
     columns = get_column_keys(model)
     synonyms = get_synonym_keys(model)
@@ -128,30 +185,35 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
     for (k, args) in follow.iteritems():
         if k not in relations:
             raise errors.MissingRelationError(k)
+
+        method = args.pop('method', method)
+        args['method'] = method
+
         rel = getattr(model, k)
-        if hasattr(rel, 'asdict'):
-            data.update({k: rel.asdict(**args)})
+
+        if hasattr(rel, method):
+            data.update({k: getattr(rel, method)(**args)})
         elif isinstance(rel, InstrumentedList):
             children = []
             for child in rel:
-                if hasattr(child, 'asdict'):
-                    children.append(child.asdict(**args))
+                if hasattr(child, method):
+                    children.append(getattr(child, method)(**args))
                 else:
                     children.append(dict(child))
             data.update({k: children})
         elif isinstance(rel, MappedCollection):
             children = {}
             for (child_key, child) in rel.iteritems():
-                if hasattr(child, 'asdict'):
-                    children[child_key] = child.asdict(**args)
+                if hasattr(child, method):
+                    children[child_key] = getattr(child, method)(**args)
                 else:
                     children[child_key] = child.dict(child)
             data.update({k: children})
         elif isinstance(rel, (AppenderMixin, Query)):
             children = []
             for child in rel.all():
-                if hasattr(child, 'asdict'):
-                    children.append(child.asdict(**args))
+                if hasattr(child, method):
+                    children.append(getattr(child, method)(**args))
                 else:
                     children.append(dict(child))
             data.update({k: children})
@@ -200,12 +262,7 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
 
     """
 
-    if follow is None:
-        follow = []
-    try:
-        follow = dict(follow)
-    except ValueError:
-        follow = dict.fromkeys(list(follow), {})
+    follow = arg_to_dict(follow)
 
     columns = get_column_keys(model)
     synonyms = get_synonym_keys(model)

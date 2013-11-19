@@ -68,6 +68,14 @@ Using include(for example for including synonyms/properties)::
     >>> session.query(User).asdict(include=['displayname']
     {'id': 1, 'username': 'Gerald', 'displayname': 'Gerald'}
 
+The `asdict` argument `method`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. Note::
+  New in v 0.1.2b4
+
+The argument `method` is used to determine which method asdict should call when following relations. If `method` is set in the follow arguments that method will be used instead. See the HAL example in :meth:`dictalchemy.utils.asdict`.
+
 Using fromdict()
 ----------------
 
@@ -123,6 +131,7 @@ Using only::
     >>> user.fromdict({'name': 'Gerald the Great', 'a_synonym': 'Other data'}, only=['name'])
     >>> dict(user)
     {'name': 'Gerald the Great', 'a_synonym': 'Data'}
+
 
 API
 ---

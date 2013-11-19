@@ -21,6 +21,8 @@ from dictalchemy.tests import (
     DynamicRelationParent,
     ParentWithOptionalChild,
     OptionalChild,
+    WithHalChild,
+    WithHalParent,
 )
 
 
@@ -246,3 +248,59 @@ class TestAsdict(TestCase):
         self.session.add(child)
         self.session.commit()
         assert parent.asdict(follow={'child':{}})['child']['id'] == child.id
+
+    def test_method_argument(self):
+
+        parent = WithHalParent()
+        self.session.add(parent)
+        self.session.commit()
+
+        assert parent.ashal() == {
+            'id': parent.id,
+            'child_id': None,
+            '_embedded': {},
+            '_links': {
+                'self': '/with_hal_parent/{0}'.format(parent.id),
+            },
+        }
+
+        child = WithHalChild()
+        parent.child = child
+        self.session.add(child)
+        self.session.commit()
+
+        result = parent.ashal(follow={'child': {'_embedded': True}})
+        expected = {
+            'id': parent.id,
+            'child_id': child.id,
+            '_embedded': {
+                'child': {
+                    'id': child.id,
+                    '_embedded': {},
+                    '_links': {
+                        'self': '/with_hal_child/{0}'.format(child.id),
+                    },
+                }
+            },
+            '_links': {
+                'self': '/with_hal_parent/{0}'.format(parent.id),
+            },
+        }
+
+        assert result == expected
+
+        # Using `method` argument when following child
+        result = parent.ashal(follow={'child': {'_embedded': True,
+                                                'method': 'asdict'}})
+        expected = {
+            'id': parent.id,
+            'child_id': child.id,
+            '_embedded': {
+                'child': {
+                    'id': child.id,
+                }
+            },
+            '_links': {
+                'self': '/with_hal_parent/{0}'.format(parent.id),
+            },
+        }

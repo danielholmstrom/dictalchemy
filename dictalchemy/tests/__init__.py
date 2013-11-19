@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division
 
 from dictalchemy import DictableModel
+from dictalchemy.utils import arg_to_dict
 import unittest
 
 from sqlalchemy import create_engine
@@ -306,3 +307,49 @@ class ParentWithOptionalChild(Base):
     id = Column(Integer, primary_key=True)
     child_id = Column(Integer, ForeignKey('optionalchild.id'), nullable=True)
     child = relationship(OptionalChild, uselist=False)
+
+
+class AsHalMixin(object):
+
+    base_url = None
+
+    def get_hal_links(self):
+        if self.base_url:
+            return {'self': '{0}/{1}'.format(self.base_url, self.id)}
+        else:
+            return {}
+
+    def ashal(self, **kwargs):
+        kwargs['method'] = 'ashal'
+        result = self.asdict(**kwargs)
+
+        follow = arg_to_dict(kwargs.get('follow', None))
+        _embedded = {}
+        for (k, args) in follow.iteritems():
+            if args.get('_embedded', None) and k in result:
+                _embedded[k] = result.pop(k)
+
+        result['_embedded'] = _embedded
+        result['_links'] = self.get_hal_links()
+
+        return result
+
+
+class WithHalChild(Base, AsHalMixin):
+
+    __tablename__ = 'withhalchild'
+
+    base_url = '/with_hal_child'
+
+    id = Column(Integer, primary_key=True)
+
+
+class WithHalParent(Base, AsHalMixin):
+
+    __tablename__ = 'withhalparent'
+
+    base_url = '/with_hal_parent'
+
+    id = Column(Integer, primary_key=True)
+    child_id = Column(Integer, ForeignKey('withhalchild.id'), nullable=True)
+    child = relationship(WithHalChild)

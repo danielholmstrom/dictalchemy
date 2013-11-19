@@ -1,3 +1,10 @@
+Version 0.1.2b4
+===============
+
+* Additional keyword arguments allowed in `asdict`
+* New parameter `method` in `asdict`
+
+
 Version 0.1.2b3
 ===============
 
