@@ -72,7 +72,7 @@ The `asdict` argument `method`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. Note::
-  New in v 0.1.2b4
+  New in v 0.1.2.1
 
 The argument `method` is used to determine which method asdict should call when following relations. If `method` is set in the follow arguments that method will be used instead. See the HAL example in :meth:`dictalchemy.utils.asdict`.
 

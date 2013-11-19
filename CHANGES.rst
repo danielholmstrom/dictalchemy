@@ -1,4 +1,4 @@
-Version 0.1.2b4
+Version 0.1.2.1
 ===============
 
 * Additional keyword arguments allowed in `asdict`
