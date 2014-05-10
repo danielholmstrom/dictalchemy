@@ -6,13 +6,12 @@ Utilities
 """
 from __future__ import absolute_import, division
 
-from sqlalchemy.orm import (
-    RelationshipProperty,
-    ColumnProperty,
-    SynonymProperty,
-    class_mapper,
+from sqlalchemy import inspect
+
+from sqlalchemy.orm.collections import (
+    InstrumentedList,
+    MappedCollection,
 )
-from sqlalchemy.orm.collections import InstrumentedList, MappedCollection
 from sqlalchemy.orm.dynamic import AppenderMixin
 from sqlalchemy.orm.query import Query
 
@@ -25,8 +24,7 @@ def get_relation_keys(model):
 
     :returns: List of RelationProperties
     """
-    return [k.key for k in model.__mapper__.iterate_properties if
-            isinstance(k, RelationshipProperty)]
+    return [column.key for column in inspect(model).mapper.relationships]
 
 
 def get_column_keys(model):
@@ -34,8 +32,7 @@ def get_column_keys(model):
 
     :returns: List of column keys
     """
-    return [k.key for k in model.__mapper__.iterate_properties if
-            isinstance(k, ColumnProperty)]
+    return [column.key for column in inspect(model).mapper.column_attrs]
 
 
 def get_synonym_keys(model):
@@ -43,8 +40,7 @@ def get_synonym_keys(model):
 
     :returns: List of keys for synonyms
     """
-    return [k.key for k in model.__mapper__.iterate_properties if
-            isinstance(k, SynonymProperty)]
+    return [c.key for c in inspect(model).mapper.synonyms]
 
 
 def get_primary_key_properties(model):
@@ -53,8 +49,7 @@ def get_primary_key_properties(model):
     :returns: Set of column keys
     """
     return set(column.key
-               for column
-               in class_mapper(model.__class__).primary_key)
+               for column in inspect(model.__class__).mapper.primary_key)
 
 
 def arg_to_dict(arg):
