@@ -1,9 +1,6 @@
 # vim: set fileencoding=utf-8 :
 from __future__ import absolute_import, division
 
-# vim: set fileencoding=utf-8 :
-from __future__ import absolute_import, division
-
 from dictalchemy import (
     DictalchemyError,
 )
@@ -15,7 +12,7 @@ from dictalchemy.tests import (
     OneToManyChild,
     OneToManyParent,
     WithHybrid,
-    WithDefaultInclude
+    WithDefaultInclude,
 )
 
 
