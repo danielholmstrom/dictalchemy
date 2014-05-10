@@ -6,8 +6,12 @@ Utilities
 """
 from __future__ import absolute_import, division
 
-from sqlalchemy.orm import (RelationshipProperty, ColumnProperty,
-                            SynonymProperty)
+from sqlalchemy.orm import (
+    RelationshipProperty,
+    ColumnProperty,
+    SynonymProperty,
+    class_mapper,
+)
 from sqlalchemy.orm.collections import InstrumentedList, MappedCollection
 from sqlalchemy.orm.dynamic import AppenderMixin
 from sqlalchemy.orm.query import Query
@@ -48,14 +52,9 @@ def get_primary_key_properties(model):
 
     :returns: Set of column keys
     """
-    # Find primary keys
-    primary_keys = set()
-    for k in model.__mapper__.iterate_properties:
-        if hasattr(k, 'columns'):
-            for c in k.columns:
-                if c.primary_key:
-                    primary_keys.add(k.key)
-    return primary_keys
+    return set(column.key
+               for column
+               in class_mapper(model.__class__).primary_key)
 
 
 def arg_to_dict(arg):
