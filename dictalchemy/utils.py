@@ -298,9 +298,9 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
     # Update simple data
     for k, v in data.iteritems():
         if not allow_pk and k in primary_keys:
-            msg = "Primary key(%r) cannot be updated by fromdict."
+            msg = "Primary key({0}) cannot be updated by fromdict."
             "Set 'dictalchemy_fromdict_allow_pk' to True in your Model"
-            " or pass 'allow_pk=True'." % k
+            " or pass 'allow_pk=True'.".format(k)
             raise errors.DictalchemyError(msg)
         if k in attrs:
             setattr(model, k, v)

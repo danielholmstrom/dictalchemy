@@ -3,6 +3,11 @@ from __future__ import absolute_import, division
 
 # vim: set fileencoding=utf-8 :
 from __future__ import absolute_import, division
+
+from dictalchemy import (
+    DictalchemyError,
+)
+
 from dictalchemy.tests import (
     TestCase,
     Named,
@@ -86,6 +91,16 @@ class TestFromdict(TestCase):
         h = WithHybrid(1)
         h.fromdict({'value': 17}, include=['value'])
         assert h.value == 17
+
+    def test_dictalchemy_include_doesnt_override_pk(self):
+        h = Named('a name')
+        try:
+            h.fromdict({'id': 1}, include=['id'])
+            assert False
+        except DictalchemyError:
+            assert True
+
+
 
     def test_dictalchemy_include(self):
         m = WithHybrid(2)
