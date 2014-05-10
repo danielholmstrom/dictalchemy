@@ -132,8 +132,7 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
                                          constants.default_exclude_underscore)
         if exclude_underscore:
             # Exclude all properties starting with underscore
-            exclude += [k.key for k in model.__mapper__.iterate_properties
-                        if k.key[0] == '_']
+            exclude += [k.key for k in info.mapper.attrs if k.key[0] == '_']
         if exclude_pk is True:
             exclude += [c.key for c in info.mapper.primary_key]
 
@@ -247,8 +246,7 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
 
         if exclude_underscore:
             # Exclude all properties starting with underscore
-            exclude += [k.key for k in model.__mapper__.iterate_properties
-                        if k.key[0] == '_']
+            exclude += [k.key for k in info.mapper.attrs if k.key[0] == '_']
 
         if allow_pk is None:
             allow_pk = getattr(model, 'dictalchemy_fromdict_allow_pk',
