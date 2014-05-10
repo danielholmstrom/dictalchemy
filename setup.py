@@ -19,7 +19,7 @@ README = open(os.path.join(here, 'README.rst')).read()
 
 # Requirements for the package
 install_requires = [
-    'SQLAlchemy>=0.8.0',
+    'SQLAlchemy>=0.9.4',
 ]
 
 # Requirement for running tests
