@@ -19,39 +19,6 @@ from dictalchemy import constants
 from dictalchemy import errors
 
 
-def get_relation_keys(model):
-    """Get relation keys for a model
-
-    :returns: List of RelationProperties
-    """
-    return [column.key for column in inspect(model).mapper.relationships]
-
-
-def get_column_keys(model):
-    """Get column keys for a model
-
-    :returns: List of column keys
-    """
-    return [column.key for column in inspect(model).mapper.column_attrs]
-
-
-def get_synonym_keys(model):
-    """Get synonym keys for a model
-
-    :returns: List of keys for synonyms
-    """
-    return [c.key for c in inspect(model).mapper.synonyms]
-
-
-def get_primary_key_properties(model):
-    """Get the column properties that affects a primary key
-
-    :returns: Set of column keys
-    """
-    return set(column.key
-               for column in inspect(model.__class__).mapper.primary_key)
-
-
 def arg_to_dict(arg):
     """Convert an argument that can be None, list/tuple or dict to dict
 
@@ -146,9 +113,12 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
     follow = arg_to_dict(follow)
 
-    columns = get_column_keys(model)
-    synonyms = get_synonym_keys(model)
-    relations = get_relation_keys(model)
+
+    info = inspect(model)
+
+    columns = [c.key for c in info.mapper.column_attrs]
+    synonyms = [c.key for c in info.mapper.synonyms]
+    relations = [c.key for c in inspect(model).mapper.relationships]
 
     if only:
         attrs = only
@@ -165,7 +135,7 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
             exclude += [k.key for k in model.__mapper__.iterate_properties
                         if k.key[0] == '_']
         if exclude_pk is True:
-            exclude += get_primary_key_properties(model)
+            exclude += [c.key for c in info.mapper.primary_key]
 
         include = (include or []) + (getattr(model,
                                              'dictalchemy_asdict_include',
@@ -258,10 +228,11 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
 
     follow = arg_to_dict(follow)
 
-    columns = get_column_keys(model)
-    synonyms = get_synonym_keys(model)
-    relations = get_relation_keys(model)
-    primary_keys = get_primary_key_properties(model)
+    info = inspect(model)
+    columns = [c.key for c in info.mapper.column_attrs]
+    synonyms = [c.key for c in info.mapper.synonyms]
+    relations = [c.key for c in info.mapper.relationships]
+    primary_keys = [c.key for c in info.mapper.primary_key]
 
     if only:
         attrs = only
