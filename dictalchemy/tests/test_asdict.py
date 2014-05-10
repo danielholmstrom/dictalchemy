@@ -172,24 +172,24 @@ class TestAsdict(TestCase):
                                          'child': {'name': c1c.name}}}
 
     def test_hybrid_property(self):
-        assert WithHybrid(2).asdict(include=['id']) == {'id': 2}
+        assert WithHybrid(2).asdict(include=['value'])['value'] == 2
 
     def test_default_include(self):
         assert WithDefaultInclude(2).asdict() == {'id': 2, 'id_alias': 2}
 
     def test_dictalchemy_include(self):
         m = WithHybrid(2)
-        assert 'id' not in dict(m)
-        setattr(m, 'dictalchemy_include', ['id'])
-        assert 'id' in dict(m)
+        assert 'value' not in dict(m)
+        setattr(m, 'dictalchemy_include', ['value'])
+        assert 'value' in dict(m)
 
     def test_dictalchemy_asdict_include_overrides(self):
         m = WithHybrid(2)
-        assert 'id' not in dict(m)
-        setattr(m, 'dictalchemy_include', ['id'])
-        assert 'id' in dict(m)
+        assert 'value' not in dict(m)
+        setattr(m, 'dictalchemy_include', ['value'])
+        assert 'value' in dict(m)
         setattr(m, 'dictalchemy_asdict_include', [])
-        assert 'id' not in dict(m)
+        assert 'value' not in dict(m)
 
     def test_attribute_mapped_collection(self):
         p = WithAttributeMappedCollection()

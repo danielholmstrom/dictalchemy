@@ -84,26 +84,26 @@ class TestFromdict(TestCase):
 
     def test_include(self):
         h = WithHybrid(1)
-        h.fromdict({'id': 17}, include=['id'])
-        assert h.id == 17
+        h.fromdict({'value': 17}, include=['value'])
+        assert h.value == 17
 
     def test_dictalchemy_include(self):
         m = WithHybrid(2)
-        m.fromdict({'id': 7})
-        assert m.id == 2
-        setattr(m, 'dictalchemy_include', ['id'])
-        m.fromdict({'id': 7})
-        assert m.id == 7
+        m.fromdict({'value': 7})
+        assert m.value == 2
+        setattr(m, 'dictalchemy_include', ['value'])
+        m.fromdict({'value': 7})
+        assert m.value == 7
 
     def test_dictalchemy_asdict_include_overrides(self):
         m = WithHybrid(2)
-        m.fromdict({'id': 7})
-        assert m.id == 2
-        setattr(m, 'dictalchemy_include', ['id'])
-        m.fromdict({'id': 7})
+        m.fromdict({'value': 7})
+        assert m.value == 2
+        setattr(m, 'dictalchemy_include', ['value'])
+        m.fromdict({'value': 7})
         setattr(m, 'dictalchemy_fromdict_include', [])
-        m.fromdict({'id': 2})
-        assert m.id == 7
+        m.fromdict({'value': 2})
+        assert m.value == 7
 
     def test_default_include(self):
         h = WithDefaultInclude(1)

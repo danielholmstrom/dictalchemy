@@ -214,18 +214,20 @@ class WithHybrid(Base):
 
     __tablename__ = 'withhybrid'
 
-    _id = Column('id', Integer, primary_key=True)
+    id = Column('id', Integer, primary_key=True)
+
+    _value = Column('value', Integer)
 
     @hybrid_property
-    def id(self):
-        return self._id
+    def value(self):
+        return self._value
 
-    @id.setter
-    def set_id(self, value):
-        self._id = value
+    @value.setter
+    def set_value(self, value):
+        self._value = value
 
-    def __init__(self, id):
-        self.id = id
+    def __init__(self, value):
+        self.value = value
 
 
 class WithDefaultInclude(Base):
