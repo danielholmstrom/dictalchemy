@@ -63,6 +63,11 @@ Using follow with arguments::
     >>> session.query(User).asdict(follow={'groups':{'exclude': ['id']})
     {'username': 'Gerald', groups=[{'name': 'User'}]}
 
+Using follow with a `parent` argument::
+
+    >>> session.query(User).asdict(follow={'groups':{'parent': 'relationships', 'exclude': ['id']})
+    {'username': 'Gerald', 'relationships': {'groups':[{'name': 'User'}]}}
+
 Using include(for example for including synonyms/properties)::
 
     >>> session.query(User).asdict(include=['displayname']

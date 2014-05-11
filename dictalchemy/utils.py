@@ -47,45 +47,18 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
            follow=None, include=None, only=None, method='asdict', **kwargs):
     """Get a dict from a model
 
+    Using the `method` parameter makes it possible to have multiple methods
+    that formats the result.
 
-    Using the method parameter makes it possible to have multiple methods that
-    formats the result.
-
-    Example HAL implementation::
-
-        from dictalchemy.utils import arg_to_dict
-
-        class HalMixin(object):
-
-            base_url = None
-
-            def get_hal_links(self):
-                if self.base_url:
-                    return {'self': '{0}/{1}'.format(self.base_url, self.id)}
-                else:
-                    return {}
-
-            def ashal(self, **kwargs):
-                kwargs['method'] = 'ashal'
-                result = self.asdict(**kwargs)
-
-                follow = arg_to_dict(kwargs.get('follow', None))
-                _embedded = {}
-                for (k, args) in follow.iteritems():
-                    if args.get('_embedded', None) and k in result:
-                        _embedded[k] = result.pop(k)
-
-                result['_embedded'] = _embedded
-                result['_links'] = self.get_hal_links()
-
-                return result
-
-    :param follow: List or dict of relationships that should be followed. \
+    :param follow: List or dict of relationships that should be followed.
             If the parameter is a dict the value should be a dict of \
-            keyword arguments. Currently it follows InstrumentedList,\
+            keyword arguments. Currently it follows InstrumentedList, \
             MappedCollection and regular 1:1, 1:m, m:m relationships. Follow \
             takes an extra argument, 'method', which is the method that \
-            should be used on the relation.
+            should be used on the relation. It also takes the extra argument \
+            'parent' which determines where the relationships data should be \
+            added in the response dict. If 'parent' is set the relationship \
+            will be added with it's own key as a child to `parent`.
     :param exclude: List of properties that should be excluded, will be \
             merged with `model.dictalchemy_exclude`
     :param exclude_pk: If True any column that refers to the primary key will \
@@ -113,12 +86,11 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
     follow = arg_to_dict(follow)
 
-
     info = inspect(model)
 
     columns = [c.key for c in info.mapper.column_attrs]
     synonyms = [c.key for c in info.mapper.synonyms]
-    relations = [c.key for c in inspect(model).mapper.relationships]
+    relations = [c.key for c in info.mapper.relationships]
 
     if only:
         attrs = only
@@ -145,45 +117,52 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
     data = dict([(k, getattr(model, k)) for k in attrs])
 
-    for (k, args) in follow.iteritems():
-        if k not in relations:
-            raise errors.MissingRelationError(k)
+    for (rel_key, args) in follow.iteritems():
+        if rel_key not in relations:
+            raise errors.MissingRelationError(rel_key)
 
         method = args.pop('method', method)
         args['method'] = method
 
-        rel = getattr(model, k)
+        rel = getattr(model, rel_key)
 
         if hasattr(rel, method):
-            data.update({k: getattr(rel, method)(**args)})
+            rel_data = getattr(rel, method)(**args)
         elif isinstance(rel, InstrumentedList):
-            children = []
+            rel_data = []
             for child in rel:
                 if hasattr(child, method):
-                    children.append(getattr(child, method)(**args))
+                    rel_data.append(getattr(child, method)(**args))
                 else:
-                    children.append(dict(child))
-            data.update({k: children})
+                    rel_data.append(dict(child))
         elif isinstance(rel, MappedCollection):
-            children = {}
+            rel_data = {}
             for (child_key, child) in rel.iteritems():
                 if hasattr(child, method):
-                    children[child_key] = getattr(child, method)(**args)
+                    rel_data[child_key] = getattr(child, method)(**args)
                 else:
-                    children[child_key] = child.dict(child)
-            data.update({k: children})
+                    rel_data[child_key] = child.dict(child)
         elif isinstance(rel, (AppenderMixin, Query)):
-            children = []
+            rel_data = []
             for child in rel.all():
                 if hasattr(child, method):
-                    children.append(getattr(child, method)(**args))
+                    rel_data.append(getattr(child, method)(**args))
                 else:
-                    children.append(dict(child))
-            data.update({k: children})
+                    rel_data.append(dict(child))
         elif rel is None:
-            data.update({k: None})
+            rel_data = None
         else:
-            raise errors.UnsupportedRelationError(k)
+            raise errors.UnsupportedRelationError(rel_key)
+
+        ins_key = args.pop('parent', None)
+
+        if ins_key is None:
+            data[rel_key] = rel_data
+        else:
+            if ins_key not in data:
+                data[ins_key] = {}
+
+            data[ins_key][rel_key] = rel_data
 
     return data
 

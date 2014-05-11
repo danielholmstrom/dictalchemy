@@ -98,6 +98,24 @@ class TestAsdict(TestCase):
                                                    'name': parent.name,
                                                    'child': child.asdict()}
 
+    def test_one_to_many_follow_with_parent(self):
+        child = OneToManyChild('child')
+        parent = OneToManyParent('parent')
+        parent.child = child
+        self.session.add(parent)
+        self.session.commit()
+        assert parent.asdict(follow={
+            'child': {
+                'parent': 'relationships',
+            },
+        }) == {
+            'id': parent.id,
+            'name': parent.name,
+            'relationships': {
+                'child': child.asdict(),
+            },
+        }
+
     def test_many_to_many_follow(self):
         s = self.session
         l1 = M2mLeft('l1')
