@@ -23,6 +23,8 @@ from dictalchemy.tests import (
     OptionalChild,
     WithHalChild,
     WithHalParent,
+    WithMethodWithExtraArgumentParent,
+    WithMethodWithExtraArgumentChild,
 )
 
 
@@ -322,3 +324,23 @@ class TestAsdict(TestCase):
                 'self': '/with_hal_parent/{0}'.format(parent.id),
             },
         }
+
+    def test_extra_kwargs(self):
+
+        parent = WithMethodWithExtraArgumentParent()
+        child = WithMethodWithExtraArgumentChild()
+        parent.child = child
+
+        self.session.add(parent)
+        self.session.add(child)
+        self.session.commit()
+
+        assert parent.asdict(follow=['child'],
+                            method='extra_method',
+                            number=123) == {
+                                'id': parent.id,
+                                'child_id': child.id,
+                                'child': {
+                                    'number': 123,
+                                },
+                            }

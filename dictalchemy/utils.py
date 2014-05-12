@@ -6,6 +6,7 @@ Utilities
 """
 from __future__ import absolute_import, division
 
+import copy
 from sqlalchemy import inspect
 
 from sqlalchemy.orm.collections import (
@@ -49,6 +50,9 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
     Using the `method` parameter makes it possible to have multiple methods
     that formats the result.
+
+    Additional keyword arguments will be passed to all relationships that are
+    followed. This can be used to pass on things like request or context.
 
     :param follow: List or dict of relationships that should be followed.
             If the parameter is a dict the value should be a dict of \
@@ -123,6 +127,7 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
         method = args.pop('method', method)
         args['method'] = method
+        args.update(copy.copy(kwargs))
 
         rel = getattr(model, rel_key)
 

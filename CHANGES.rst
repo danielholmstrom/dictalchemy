@@ -1,3 +1,15 @@
+Version 0.1.2.3
+===============
+
+* All extra keyword arguments to asdict are now passed on to followed relations.
+
+Version 0.1.2.2
+===============
+
+* Using sqlalchemy.inspect to find model attributes
+* Min sqlalchemy version set to 0.9.4
+* New parameter `parent` for follow argument in `asdict`
+
 Version 0.1.2.1
 ===============
 

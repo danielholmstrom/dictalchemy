@@ -355,3 +355,26 @@ class WithHalParent(Base, AsHalMixin):
     id = Column(Integer, primary_key=True)
     child_id = Column(Integer, ForeignKey('withhalchild.id'), nullable=True)
     child = relationship(WithHalChild)
+
+
+class WithMethodWithExtraArgumentChild(Base):
+
+    __tablename__ = 'withmethodwithextraargumentchild'
+
+    id = Column(Integer, primary_key=True)
+
+    def extra_method(self, number, **kwargs):
+        return {'number': number}
+
+
+class WithMethodWithExtraArgumentParent(Base):
+
+    __tablename__ = 'withmethodwithextraargumentparent'
+
+    id = Column(Integer, primary_key=True)
+
+    child_id = Column(Integer,
+                      ForeignKey('withmethodwithextraargumentchild.id'),
+                      nullable=True)
+
+    child = relationship(WithMethodWithExtraArgumentChild)
