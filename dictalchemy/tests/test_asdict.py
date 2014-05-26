@@ -344,3 +344,33 @@ class TestAsdict(TestCase):
                                     'number': 123,
                                 },
                             }
+
+    def test_follow_args_are_not_modified(self):
+
+        parent = WithMethodWithExtraArgumentParent()
+        child = WithMethodWithExtraArgumentChild()
+        parent.child = child
+
+        self.session.add(parent)
+        self.session.add(child)
+        self.session.commit()
+
+        args = {
+            'follow': {
+                'child': {
+                    'parent': 'some_parent',
+                },
+            },
+        }
+
+        orig_args = {
+            'follow': {
+                'child': {
+                    'parent': 'some_parent',
+                },
+            },
+        }
+
+        parent.asdict(**args)
+
+        assert args == orig_args

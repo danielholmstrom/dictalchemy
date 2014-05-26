@@ -121,10 +121,11 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
     data = dict([(k, getattr(model, k)) for k in attrs])
 
-    for (rel_key, args) in follow.iteritems():
+    for (rel_key, orig_args) in follow.iteritems():
         if rel_key not in relations:
             raise errors.MissingRelationError(rel_key)
 
+        args = copy.deepcopy(orig_args)
         method = args.pop('method', method)
         args['method'] = method
         args.update(copy.copy(kwargs))
