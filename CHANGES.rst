@@ -1,3 +1,8 @@
+Version 0.1.2.4
+===============
+
+* Fixed bug where follow arguments were modified instead of a copy of the arguments.
+
 Version 0.1.2.3
 ===============
 
