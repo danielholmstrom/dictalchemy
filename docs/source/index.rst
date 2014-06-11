@@ -7,7 +7,7 @@ Dictalchemy adds :func:`utils.asdict` and :func:`utils.fromdict` methods to `SQL
 
 Currently this works with synonyms and simple relationships as one-to-many and many-to-many. Relationships can be followed in many levels.
 
-The only collections currently supported is `sqlalchemy.orm.collections.InstrumentedList` and `sqlalchemy.orm.collections.MappedCollection`.
+Any collection that inherits from `dict` or `list` is supported together with :class:`sqlalchemy.orm.dynamic.AppenderMixin` and :class:`sqlalchemy.orm.query.Query`.
 
 Using DictableModel
 -------------------
