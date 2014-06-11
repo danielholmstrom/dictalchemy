@@ -25,6 +25,8 @@ from dictalchemy.tests import (
     WithHalParent,
     WithMethodWithExtraArgumentParent,
     WithMethodWithExtraArgumentChild,
+    OrderingParent,
+    OrderingChild,
 )
 
 
@@ -374,3 +376,14 @@ class TestAsdict(TestCase):
         parent.asdict(**args)
 
         assert args == orig_args
+
+    def test_orderinglist(self):
+
+        parent = OrderingParent()
+        parent.children.append(OrderingChild())
+        parent.children.append(OrderingChild())
+
+        assert parent.asdict(only=['children'],
+                             follow={'children': {'only': ['position']}}) == {
+            'children': [{'position': 0}, {'position': 1}],
+            }

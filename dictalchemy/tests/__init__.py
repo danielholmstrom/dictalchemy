@@ -11,6 +11,7 @@ from sqlalchemy import Table, Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship, backref, synonym
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.collections import attribute_mapped_collection
+from sqlalchemy.ext.orderinglist import ordering_list
 
 
 # Setup sqlalchemy
@@ -378,3 +379,24 @@ class WithMethodWithExtraArgumentParent(Base):
                       nullable=True)
 
     child = relationship(WithMethodWithExtraArgumentChild)
+
+
+class OrderingChild(Base):
+
+    __tablename__ = 'orderingchild'
+
+    id = Column(Integer, primary_key=True)
+
+    position = Column(Integer)
+
+    parent_id = Column(Integer, ForeignKey('orderingparent.id'))
+
+
+class OrderingParent(Base):
+    __tablename__ = 'orderingparent'
+
+    id = Column(Integer, primary_key=True)
+
+    children = relationship(OrderingChild,
+                            order_by=OrderingChild.position,
+                            collection_class=ordering_list('position'))
