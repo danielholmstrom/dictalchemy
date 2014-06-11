@@ -2,6 +2,7 @@ Version 0.1.2.4
 ===============
 
 * Fixed bug where follow arguments were modified instead of a copy of the arguments.
+* Checking for list or dict when following relations instead of specific classes
 
 Version 0.1.2.3
 ===============

@@ -134,14 +134,14 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
         if hasattr(rel, method):
             rel_data = getattr(rel, method)(**args)
-        elif isinstance(rel, InstrumentedList):
+        elif isinstance(rel, list):
             rel_data = []
             for child in rel:
                 if hasattr(child, method):
                     rel_data.append(getattr(child, method)(**args))
                 else:
                     rel_data.append(dict(child))
-        elif isinstance(rel, MappedCollection):
+        elif isinstance(rel, dict):
             rel_data = {}
             for (child_key, child) in rel.iteritems():
                 if hasattr(child, method):
