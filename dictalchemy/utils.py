@@ -9,10 +9,6 @@ from __future__ import absolute_import, division
 import copy
 from sqlalchemy import inspect
 
-from sqlalchemy.orm.collections import (
-    InstrumentedList,
-    MappedCollection,
-)
 from sqlalchemy.orm.dynamic import AppenderMixin
 from sqlalchemy.orm.query import Query
 
