@@ -12,6 +12,7 @@ from sqlalchemy.orm import relationship, backref, synonym
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.ext.orderinglist import ordering_list
+from sqlalchemy.ext.associationproxy import association_proxy
 
 
 # Setup sqlalchemy
@@ -400,3 +401,77 @@ class OrderingParent(Base):
     children = relationship(OrderingChild,
                             order_by=OrderingChild.position,
                             collection_class=ordering_list('position'))
+
+
+m2m_associationproxy_table = Table(
+    'm2maassociationlisttable',
+    Base.metadata,
+    Column('parent_id', Integer, ForeignKey("m2massociationlistparent.id"),
+           primary_key=True),
+    Column('child_id', Integer, ForeignKey("m2massociationlistchild.id"),
+           primary_key=True))
+
+
+class M2MAssociationListParent(Base):
+
+    __tablename__ = 'm2massociationlistparent'
+
+    id = Column(Integer, primary_key=True)
+
+    children = relationship('M2MAssociationListChild',
+                            secondary=lambda: m2m_associationproxy_table)
+
+    child_list = association_proxy('children', 'id')
+
+
+class M2MAssociationListChild(Base):
+
+    __tablename__ = 'm2massociationlistchild'
+
+    id = Column(Integer, primary_key=True)
+
+
+class M2MAssociationDictParent(Base):
+
+    __tablename__ = 'm2massociationdictparent'
+
+    id = Column(Integer, primary_key=True)
+
+    children = association_proxy(
+                'child_ids',
+                'id',
+                creator=lambda k, v: M2MAssociationDictKey(the_child_key=k,
+                                                           the_child_value=v))
+
+
+class M2MAssociationDictKey(Base):
+
+    __tablename__ = 'm2massociationdictkey'
+
+    parent_id = Column(Integer,
+                       ForeignKey('m2massociationdictparent.id'),
+                       primary_key=True)
+
+    child_id = Column(Integer,
+                      ForeignKey('m2massociationdictchild.id'),
+                      primary_key=True)
+
+    the_child_key = Column(String)
+
+    user = relationship(M2MAssociationDictParent, backref=backref(
+            "children",
+            collection_class=attribute_mapped_collection("the_child_key"),
+            cascade="all, delete-orphan"))
+
+    _child_value = relationship("M2MAssociationDictChild")
+
+    child_value = association_proxy('_child_value', 'the_child_value')
+
+
+class M2MAssociationDictChild(Base):
+
+    __tablename__ = 'm2massociationdictchild'
+
+    id = Column(Integer, primary_key=True)
+
+    the_child_value = Column(String())

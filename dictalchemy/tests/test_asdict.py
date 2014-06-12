@@ -27,7 +27,9 @@ from dictalchemy.tests import (
     WithMethodWithExtraArgumentChild,
     OrderingParent,
     OrderingChild,
-)
+    M2MAssociationListParent,
+    M2MAssociationListChild,
+    M2MAssociationDictParent)
 
 
 class TestAsdict(TestCase):
@@ -386,4 +388,54 @@ class TestAsdict(TestCase):
         assert parent.asdict(only=['children'],
                              follow={'children': {'only': ['position']}}) == {
             'children': [{'position': 0}, {'position': 1}],
+            }
+
+    def test_follow_m2m_association_list(self):
+
+        parent = M2MAssociationListParent()
+        child1 = M2MAssociationListChild(id=2)
+        child2 = M2MAssociationListChild(id=7)
+
+        parent.children.append(child1)
+        parent.children.append(child2)
+
+        assert parent.asdict(
+            only=['child_list'],
+            follow={'child_list': {}}) == {'child_list': [2, 7]}
+
+        self.session.add(parent)
+        self.session.add(child1)
+        self.session.add(child2)
+
+        self.session.commit()
+
+        assert parent.asdict(
+            only=['child_list'],
+            follow={'child_list': {}}) == {'child_list': [2, 7]}
+
+    def test_follow_m2m_association_dict(self):
+
+        parent = M2MAssociationDictParent()
+
+        parent.child_dict = {'key a': 'value a', 'key b': 'value b'}
+
+        assert parent.asdict(
+            only=['child_dict'],
+            follow={'child_dict': {}}) == {
+                'child_dict': {
+                    'key a': 'value a',
+                    'key b': 'value b',
+                },
+            }
+
+        self.session.add(parent)
+        self.session.commit()
+
+        assert parent.asdict(
+            only=['child_dict'],
+            follow={'child_dict': {}}) == {
+                'child_dict': {
+                    'key a': 'value a',
+                    'key b': 'value b',
+                },
             }

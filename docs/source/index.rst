@@ -7,8 +7,6 @@ Dictalchemy adds :func:`utils.asdict` and :func:`utils.fromdict` methods to `SQL
 
 Currently this works with synonyms and simple relationships as one-to-many and many-to-many. Relationships can be followed in many levels.
 
-Any collection that inherits from `dict` or `list` is supported together with :class:`sqlalchemy.orm.dynamic.AppenderMixin` and :class:`sqlalchemy.orm.query.Query`.
-
 Using DictableModel
 -------------------
 
@@ -37,6 +35,8 @@ Default values are defined in :mod:`dictalchemy.constants`.
 
 Using asdict()
 --------------
+
+Any collection that inherits from `dict` or `list` is supported together with :class:`sqlalchemy.orm.dynamic.AppenderMixin`, :class:`sqlalchemy.orm.query.Query`  :class:`sqlalchemy.orm.associationproxy._AssociationList` and :class:`sqlalchemy.orm.associationproxy._AssociationDict`.
 
 Simple example::
 

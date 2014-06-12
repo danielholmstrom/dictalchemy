@@ -8,6 +8,7 @@ from __future__ import absolute_import, division
 
 import copy
 from sqlalchemy import inspect
+from sqlalchemy.ext.associationproxy import _AssociationList
 
 from sqlalchemy.orm.dynamic import AppenderMixin
 from sqlalchemy.orm.query import Query
@@ -90,7 +91,6 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
 
     columns = [c.key for c in info.mapper.column_attrs]
     synonyms = [c.key for c in info.mapper.synonyms]
-    relations = [c.key for c in info.mapper.relationships]
 
     if only:
         attrs = only
@@ -118,7 +118,10 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
     data = dict([(k, getattr(model, k)) for k in attrs])
 
     for (rel_key, orig_args) in follow.iteritems():
-        if rel_key not in relations:
+
+        try:
+            rel = getattr(model, rel_key)
+        except AttributeError:
             raise errors.MissingRelationError(rel_key)
 
         args = copy.deepcopy(orig_args)
@@ -126,31 +129,42 @@ def asdict(model, exclude=None, exclude_underscore=None, exclude_pk=None,
         args['method'] = method
         args.update(copy.copy(kwargs))
 
-        rel = getattr(model, rel_key)
-
         if hasattr(rel, method):
             rel_data = getattr(rel, method)(**args)
-        elif isinstance(rel, list):
+        elif isinstance(rel, (list, _AssociationList)):
             rel_data = []
+
             for child in rel:
                 if hasattr(child, method):
                     rel_data.append(getattr(child, method)(**args))
                 else:
-                    rel_data.append(dict(child))
+                    try:
+                        rel_data.append(dict(child))
+                        # TypeError is for non-dictable children
+                    except TypeError:
+                        rel_data.append(copy.copy(child))
+
         elif isinstance(rel, dict):
             rel_data = {}
+
             for (child_key, child) in rel.iteritems():
                 if hasattr(child, method):
                     rel_data[child_key] = getattr(child, method)(**args)
                 else:
-                    rel_data[child_key] = child.dict(child)
+                    try:
+                        rel_data[child_key] = dict(child)
+                    except ValueError:
+                        rel_data[child_key] = copy.copy(child)
+
         elif isinstance(rel, (AppenderMixin, Query)):
             rel_data = []
+
             for child in rel.all():
                 if hasattr(child, method):
                     rel_data.append(getattr(child, method)(**args))
                 else:
                     rel_data.append(dict(child))
+
         elif rel is None:
             rel_data = None
         else:
