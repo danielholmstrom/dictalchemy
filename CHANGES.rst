@@ -1,4 +1,4 @@
-Version 0.1.2.5
+Version 0.1.2.6
 ===============
 
 * Support for _AssociationList and _AssociationDict with asdict
