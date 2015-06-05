@@ -210,7 +210,7 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
     :param include: List of properties that should be included. This list \
             will override anything in the exclude list. It will not override \
             allow_pk.
-    :param only: List of the only properties that should be returned. This \
+    :param only: List of the only properties that should be set. This \
             will not override `allow_pk` or `follow`.
 
     :raises: :class:`dictalchemy.errors.DictalchemyError` If a primary key is \
