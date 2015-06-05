@@ -1,3 +1,8 @@
+Version 0.1.2.7
+===============
+
+* Bugfix for how fromdict handles `allow_pk` in combination with `exclude`
+
 Version 0.1.2.6
 ===============
 
