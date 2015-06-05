@@ -228,8 +228,12 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
     relations = [c.key for c in info.mapper.relationships]
     primary_keys = [c.key for c in info.mapper.primary_key]
 
+    if allow_pk is None:
+        allow_pk = getattr(model, 'dictalchemy_fromdict_allow_pk',
+                           constants.default_fromdict_allow_pk)
+
     if only:
-        attrs = only
+        valid_keys = only
     else:
         exclude = exclude or []
         exclude += getattr(model, 'dictalchemy_exclude',
@@ -243,26 +247,28 @@ def fromdict(model, data, exclude=None, exclude_underscore=None,
             # Exclude all properties starting with underscore
             exclude += [k.key for k in info.mapper.attrs if k.key[0] == '_']
 
-        if allow_pk is None:
-            allow_pk = getattr(model, 'dictalchemy_fromdict_allow_pk',
-                               constants.default_fromdict_allow_pk)
-
         include = (include or []) + (getattr(model,
                                              'dictalchemy_fromdict_include',
                                              getattr(model,
                                                      'dictalchemy_include',
                                                      None)) or [])
-        attrs = [k for k in columns + synonyms if k not in exclude] + include
+        valid_keys = [k for k in columns + synonyms
+                      if k not in exclude] + include
 
-    # Update simple data
-    for k, v in data.iteritems():
-        if not allow_pk and k in primary_keys:
-            msg = "Primary key({0}) cannot be updated by fromdict."
-            "Set 'dictalchemy_fromdict_allow_pk' to True in your Model"
-            " or pass 'allow_pk=True'.".format(k)
-            raise errors.DictalchemyError(msg)
-        if k in attrs:
-            setattr(model, k, v)
+    # Keys that will be updated
+    update_keys = set(valid_keys) & set(data.keys())
+
+    # Check for primary keys
+    data_primary_key= update_keys & set(primary_keys)
+    if len(data_primary_key) and not allow_pk:
+        msg = ("Primary keys({0}) cannot be updated by fromdict."
+               "Set 'dictalchemy_fromdict_allow_pk' to True in your Model"
+               " or pass 'allow_pk=True'.").format(','.join(data_primary_key))
+        raise errors.DictalchemyError(msg)
+
+    # Update columns and synonyms
+    for k in update_keys:
+        setattr(model, k, data[k])
 
     # Update simple relations
     for (k, args) in follow.iteritems():

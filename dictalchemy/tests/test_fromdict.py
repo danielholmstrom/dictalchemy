@@ -138,3 +138,20 @@ class TestFromdict(TestCase):
         named = Named('a name')
         named.fromdict({'name': 'other name'}, exclude='name', only=['name'])
         assert named.name == 'other name'
+
+    def test_exluded_pk_will_not_raise_exception(self):
+        named = Named('a name')
+        self.session.add(named)
+        self.session.commit()
+        original_id = named.id
+
+        named.fromdict({'id': original_id + 1}, exclude=['id'])
+        assert named.id == original_id
+
+    def test_excluded_pk_with_allow_pk_will_not_be_changed(self):
+        named = Named('a name')
+        self.session.add(named)
+        self.session.commit()
+        original_id = named.id
+        named.fromdict({'id': original_id + 1}, allow_pk=True, exclude=['id'])
+        assert named.id == original_id
